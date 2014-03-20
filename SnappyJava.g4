@@ -48,24 +48,24 @@ braceStatement
   ;
 
 expression
-  :  expression operator expression
+  : expression operator expression
   | expression '[' expression ']'
-  |  expression '.length'
-  |  expression '.' Id '(' expressionList ')'
-  |  IntLiteral
+  | expression '.length'
+  | expression '.' Id '(' expressionList ')'
+  | IntLiteral
   | 'true'
   | 'false'
   | Id
-  |  'this'
+  | 'this'
   | 'new int [' expression ']'
   | 'new ' Id '()'
   | '!' expression
   | parenExpression
-  |  LongLiteral
+  | LongLiteral
   ;
 
 expressionList
-  :  expression expressionRest*
+  : expression expressionRest*
   ;
 
 expressionRest
@@ -76,42 +76,36 @@ parenExpression
   : '(' expression ')'
   ;
 
-operator
-  :  '&&'
-  | '<'
-  |  '+'
-  |  '-'
-  |  '*'
-  ;
+
 
 Id
-  :  Letter LetterOrDigit*
+  : Letter LetterOrDigit*
   ;
 
 
 fragment
 Letter
-  :  [a-zA-Z$_]
+  : [a-zA-Z$_]
   ;
 
 fragment
 LetterOrDigit
-  :  [a-zA-Z0-9$_]
+  : [a-zA-Z0-9$_]
   ;
 
 LongLiteral
-  :  '0'[lL]
-  |  NonZeroDigit Digit* [lL]
+  : '0'[lL]
+  | NonZeroDigit Digit* [lL]
   ;
 
 IntLiteral
-  :  NonZeroDigit Digit*
+  : NonZeroDigit Digit*
   ;
 
 fragment
 Digit
-  :  '0'
-  |  NonZeroDigit
+  : '0'
+  | NonZeroDigit
   ;
 
 fragment
@@ -119,6 +113,16 @@ NonZeroDigit
   : [1-9]
   ;
 
+
+//Operator
+
+operator
+  : '&&'
+  | '<'
+  | '+'
+  | '-'
+  | '*'
+  ;
 
 //Keywords
 
@@ -140,6 +144,3 @@ RIGHTBRACK    : ']';
 SEMI          : ';';
 COMMA         : ',';
 DOT           : '.';
-
-
-//Operator
