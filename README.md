@@ -1,4 +1,4 @@
-tjelvar
-=======
+SnappyJava
+===========
 
-tjelvar the mini-java compiler
+SnappyJava the mini-java compiler

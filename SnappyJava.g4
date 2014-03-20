@@ -1,4 +1,4 @@
-grammar tjelvar;
+grammar SnappyJava;
 
 program
   : mainClass classDeclaration*
@@ -88,6 +88,7 @@ Id
   :  Letter LetterOrDigit*
   ;
 
+
 fragment
 Letter
   :  [a-zA-Z$_]
@@ -122,8 +123,8 @@ NonZeroDigit
 //Keywords
 
 TRUE          : 'true';
-FALSE         :  'false';  
-THIS          :  'this';
+FALSE         : 'false';
+THIS          : 'this';
 NEW           : 'new';
 INT           : 'int';
 STRING        : 'String';
