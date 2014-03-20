@@ -9,7 +9,8 @@ fi
 
 FILENAME=${1%%.*}
 echo "Generating Java files..."
-java -jar /usr/local/lib/antlr-4.2-complete.jar $FILENAME.g4
+java -jar /usr/local/lib/antlr-4.2-complete.jar -package se.ludrik.snappyj -o ./src/se/ludrik/snappyj/ -no-listener -visitor $FILENAME.g4
+
 
 echo "Compiling Java files..."
 javac $FILENAME*.java
