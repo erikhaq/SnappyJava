@@ -42,7 +42,19 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   }
 
   @Override public Object visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
-    return super.visitClassDecl(ctx);
+    currentClass = symbolTable.addClass(ctx.ID().getText());
+
+    for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+
+    for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
+      m.accept(this);
+    }
+
+    currentClass = null;
+    return null;
+    //return super.visitClassDecl(ctx);
   }
 
   @Override public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
@@ -60,13 +72,20 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
     System.out.println(currentClass);
-
-    return super.visitMainClass(ctx);
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+    //return super.visitMainClass(ctx);
+    currentClass = null;
+    return null;
   }
 
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
-    //add to symboltable
-    //visit formallist vardeclr
+    String returnType = ctx.type().getText(), methodId = ctx.ID().getText();
+    currentMethod = symbolTable.classes.get(currentClass.id).addMethod(returnType, methodId);
+    //visit formallist here!!
+
+    //visit vardeclr here!!
     currentMethod = null;
     return null;
     //return super.visitMethodDecl(ctx);
