@@ -1,146 +1,106 @@
 grammar SnappyJava;
 
-program
-  : mainClass classDeclaration*
-  ;
+program : mainClass (classDecl)* ;
 
-mainClass
-  : 'class' Id '{' 'public static void main' '(' STRING LEFTBRACK RIGHTBRACK Id '{' varDeclaration* statement* '}'
-  ;
+mainClass 	: CLASS ID LBRACE PUBLIC STATIC VOID 'main' LPAREN STRING LBRACK RBRACK ID RPAREN LBRACE (varDecl)* (stmt)* RBRACE RBRACE;
+classDecl 	: CLASS ID LBRACE (varDecl)* (methodDecl)* RBRACE	; 
+varDecl		: type ID ENDL;
+methodDecl 	: PUBLIC type ID LPAREN formalList RPAREN LBRACE (varDecl)* (stmt)* RETURN expr ENDL RBRACE	;
 
-classDeclaration
-  : 'class' Id '{' varDeclaration* methodDeclaration* '}'
-  ;
+formalList : type ID (formalRest)* 
+	|;
 
-varDeclaration
-  : type Id
-  ;
+formalRest : ',' type ID ;
 
-methodDeclaration
-  : 'public' type Id '(' formalList ')' '{' varDeclaration* statement* 'return' expression ';' '}'
-  ;
+type: INT LBRACK RBRACK
+	| BOOLEAN
+	| INT
+	| ID
+	;
 
-formalList
-  : type Id formalRest*
-  |
-  ;
+stmt: LBRACE (stmt)* RBRACE
+	| IF LPAREN expr RPAREN stmt ELSE stmt
+	| WHILE LPAREN expr RPAREN stmt
+	| SOUT LPAREN expr RPAREN ENDL 
+	| ID '=' expr ENDL
+	| ID LBRACK expr RBRACK '=' expr ENDL
+	;	
 
-formalRest
-  : ',' type Id
-  ;
+expr: expr op expr
+	| expr LBRACK expr RBRACK
+	| expr '.' LENGTH
+	| expr '.' ID LPAREN exprList RPAREN
+	| NUM
+	| boolLiterals
+	| ID
+	| THIS
+	| NEW INT LBRACK expr RBRACK
+	| NEW ID LPAREN RPAREN
+	| '!' expr
+	| LPAREN expr RPAREN 
+	;
 
-type
-  : 'int[]'
-  | 'boolean'
-  | 'int'
-  | Id
-  ;
+op : 	'&&'
+	| 	'<'
+	| 	'>'
+	| 	'*'
+	| 	'+'
+	| 	'-'
+	;
 
-statement
-  : braceStatement
-  | 'if' parenExpression statement 'else' statement
-  | 'while' parenExpression statement
-  | 'System.out.println' parenExpression
-  ;
+exprList : expr (exprRest)*
+	|;
 
-braceStatement
-  : '{' statement* '}'
-  ;
+exprRest : COMMA expr ;
 
-expression
-  : expression operator expression
-  | expression '[' expression ']'
-  | expression '.length'
-  | expression '.' Id '(' expressionList ')'
-  | IntLiteral
-  | 'true'
-  | 'false'
-  | Id
-  | 'this'
-  | 'new int [' expression ']'
-  | 'new ' Id '()'
-  | '!' expression
-  | parenExpression
-  | LongLiteral
-  ;
+boolLiterals : (TRUE|FALSE) ;
 
-expressionList
-  : expression expressionRest*
-  ;
+BOOLEAN : 'boolean'	;
+STRING	: 'String'	;
+INT		: 'int'		;
+IF		: 'if'		;
+ELSE	: 'else'	;
+WHILE	: 'while'	;
+RETURN	: 'return'	;
+CLASS	: 'class'	;
+VOID	: 'void'	;
+STATIC	: 'static'	;
+PUBLIC	: 'public'	;
+SOUT	: 'System.out.println';
+THIS	: 'this'	;
+NEW		: 'new'		;
+LENGTH	: 'length'	;
+EPSILON	: ''		;
 
-expressionRest
-  : ',' expression
-  ;
+TRUE 	: 'true'	;
+FALSE 	: 'false'	;
+//BoolLiterals : TRUE|FALSE;
 
-parenExpression
-  : '(' expression ')'
-  ;
+// separators
+LPAREN	: '('	;
+RPAREN	: ')'	;
+LBRACK	: '['	;
+RBRACK	: ']'	;
+LBRACE	: '{'	;
+RBRACE	: '}'	;
+ENDL	: ';'	;
+COMMA	: ','	;
 
+AND : '&&'	;
+LT  : '<'	;
+GT	: '>'	;
+ADD	: '+'	;
+SUB	: '-'	;
+MUL : '*'	;
 
+ID	: LETTER (LETTER|DIGIT)* ;
+NUM : [0]|[1-9]DIGIT* ;
+WS  : [\t\n\r' ']+ -> skip ;
+COMMENT : '/*' .*? '*/' -> skip ;
+LINE_COMMENT : '//' ~[\r\n]* -> skip ;
+/*
+	Helper tokens
+*/
+fragment LETTER : [a-zA-Z_] ;
+fragment DIGIT : [0-9] ;
 
-Id
-  : Letter LetterOrDigit*
-  ;
-
-
-fragment
-Letter
-  : [a-zA-Z$_]
-  ;
-
-fragment
-LetterOrDigit
-  : [a-zA-Z0-9$_]
-  ;
-
-LongLiteral
-  : '0'[lL]
-  | NonZeroDigit Digit* [lL]
-  ;
-
-IntLiteral
-  : NonZeroDigit Digit*
-  ;
-
-fragment
-Digit
-  : '0'
-  | NonZeroDigit
-  ;
-
-fragment
-NonZeroDigit
-  : [1-9]
-  ;
-
-
-//Operator
-
-operator
-  : '&&'
-  | '<'
-  | '+'
-  | '-'
-  | '*'
-  ;
-
-//Keywords
-
-TRUE          : 'true';
-FALSE         : 'false';
-THIS          : 'this';
-NEW           : 'new';
-INT           : 'int';
-STRING        : 'String';
-
-
-//Separators
-LEFTPAREN     : '(';
-RIGHTPAREN    : ')';
-LEFTBRACE     : '{';
-RIGHTBRACE    : '}';
-LEFTBRACK     : '[';
-RIGHTBRACK    : ']';
-SEMI          : ';';
-COMMA         : ',';
-DOT           : '.';
