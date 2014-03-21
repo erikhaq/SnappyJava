@@ -21,12 +21,15 @@ public class SymbolTable {
   public SnappyClass addMainClass(String classId, String mainMethodParamId) {
     mainClass = new SnappyClass(classId);
     SnappyVariable param = new SnappyVariable(mainMethodParamId, "String[]");
-    mainClass.addMethod("void", "main", Arrays.asList(param));
+    mainClass.addMethod("void", "main");
+    mainClass.methods.get("main").addParameter(param);
     return mainClass;
   }
 
-  public SnappyClass addClass() {
-    return null;
+  public SnappyClass addClass(String classId) {
+    SnappyClass newClass = new SnappyClass(classId);
+    classes.put(classId, newClass);
+    return newClass;
   }
 
   // Class class
@@ -46,13 +49,11 @@ public class SymbolTable {
       fields.put(variable.id, variable);
     }
 
-    public void addMethod(String returnType, String id, List<SnappyVariable> params) {
+    public SnappyMethod addMethod(String returnType, String id) {
       SnappyMethod method = new SnappyMethod(id);
-      for(SnappyVariable p : params) {
-        method.addParameter(p);
-      }
       method.setReturnType(returnType);
       methods.put(method.id, method);
+      return method;
     }
 
     @Override
