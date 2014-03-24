@@ -20,11 +20,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
   }
 
-  @Override public Object visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
-    return super.visitProgram(ctx);
-  }
-
-
   @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
     currentMethod = currentClass.methods.get("main");
@@ -56,11 +51,8 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
       m.accept(this);
     }
 
-    //System.out.println(currentClass);
-
     currentClass = null;
     return null;
-    //return super.visitClassDecl(ctx);
   }
 
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
@@ -109,9 +101,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
         // this variable belongs to a method.
         if(currentMethod.variables.containsKey(ctx.ID().getText())) {
           ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
-          //ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), "boolean", "int"); //testar
-          //ErrorHandler.missingSymbol(ctx.ID().getSymbol(), "Main"); //testar
-
           return null;
         }
         currentMethod.addVariable(ctx.type().getText(), ctx.ID().getText());
