@@ -34,6 +34,16 @@ public class ErrorHandler {
     System.err.printf("Error:(%d, %d) java: incompatible types\n\t\t\t\t\trequired:\t%s\n\t\t\t\t\t\t found:\t%s\n", token.getLine(), token.getCharPositionInLine(), requiredType, foundType);
   }
 
+  public static void missingSymbol(Token token) {
+    //Error:(42, 5) java: cannot find symbol
+    //symbol:   variable bajs
+    //location: class se.ludrik.snappyj.Main
+
+    //Error:(43, 5) java: cannot find symbol
+    //symbol:   class Hora
+    //location: class se.ludrik.snappyj.Main
+  }
+
   private class Error {
 
     public Error() {
