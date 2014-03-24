@@ -71,7 +71,7 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     }
     currentMethod = null;
     return null;
-    //return super.visitMethodDecl(ctx);
+
   }
 
 
@@ -96,28 +96,26 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     return null;
   }
   @Override public Object visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
+    String varId = ctx.ID().getText(), varType = ctx.type().getText();
 
-    if(currentClass != null) {
-
-      if(currentMethod != null){
-        // this variable belongs to a method.
-        if(currentMethod.variables.containsKey(ctx.ID().getText())) {
-          ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
-          return null;
-        }
-        currentMethod.addVariable(ctx.type().getText(), ctx.ID().getText());
-
-      } else {
-        // we are not in the scope of a method so this variable must be a field
-        if(currentClass.fields.containsKey(ctx.ID().getText())) {
-          ErrorHandler.variableAlreadyDefinedInClass(ctx.ID().getSymbol(), currentClass.id);
-          return null;
-        }
-        currentClass.addField(ctx.ID().getText(), ctx.type().getText());
-
+    if(currentMethod != null){
+      // this variable belongs to a method.
+      if(currentMethod.variables.containsKey(varId) || currentMethod.parameters.containsKey(varId)) {
+        ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
+        return null;
       }
+      currentMethod.addVariable(varType, varId);
+
+    } else {
+      // we are not in the scope of a method so this variable must be a field
+      if(currentClass.fields.containsKey(varId)) {
+        ErrorHandler.variableAlreadyDefinedInClass(ctx.ID().getSymbol(), currentClass.id);
+        return null;
+      }
+      currentClass.addField(ctx.ID().getText(), ctx.type().getText());
+
     }
     return null;
-  }
+ }
 
 }
