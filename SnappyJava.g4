@@ -38,6 +38,7 @@ expr: expr op expr 							# BinaryOp
 	| NEW ID LPAREN RPAREN 					# NewIdExp
 	| '!' expr 								# NotExp
 	| LPAREN expr RPAREN 					# ParenExp
+	;
 
 op : 	'&&'
 	| 	'<'
