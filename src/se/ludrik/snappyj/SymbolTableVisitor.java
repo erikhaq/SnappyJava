@@ -58,8 +58,7 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     String returnType = ctx.type().getText(), methodId = ctx.ID().getText();
     if(currentClass.methods.containsKey(methodId)) {
-      //TODO Method already defined. PRINT ERROR
-
+      ErrorHandler.methodAlreadyDefined(ctx.ID().getSymbol(), currentClass.id);
       return null;
     }
     currentMethod = currentClass.addMethod(returnType, methodId);
