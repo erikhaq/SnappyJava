@@ -19,3 +19,11 @@ class Fac {
     }
 
 }
+
+class Fac {
+  int bajs;
+  int a;
+
+
+
+}
