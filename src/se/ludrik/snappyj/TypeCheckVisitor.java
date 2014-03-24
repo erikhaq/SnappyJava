@@ -54,7 +54,18 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
+    //TODO does return type exist
+    String returnType = ctx.type().getText();
+    if(!isValidType(returnType)) {
+      //TODO throw error no such type
+      ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
 
+    }
+    //Visit formalList
+    //vist varDeclarations
+    // visit statmenets
+    //visit return expression
+    //check return expression is same as return type
     return null;
   }
 
