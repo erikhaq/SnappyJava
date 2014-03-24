@@ -81,7 +81,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnExpr = ctx.expr().accept(this);
     if(!returnType.equals(returnExpr)) {
       // the return expression is not same as return type
-      ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
+      //ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
     }
     //check return expression is same as return type
     currentMethod = null;
@@ -104,7 +104,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
       if(!isValidType(varType.toString())) {
         // send error message here for no such symbol
-        ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+        //ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
       }
     }
     return varType;
@@ -241,7 +241,11 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
-    return super.visitLengthExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyType exprType = ctx.expr().accept(this);
+    if(!SnappyType.reservedTypes.get(1).equals(exprType)) {
+      ErrorHandler.notAStatement(ctx.getStart());
+    }
+    return new SnappyType("int[]");
   }
 
   @Override
