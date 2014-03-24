@@ -25,6 +25,7 @@ public class SymbolTable {
     SnappyVariable param = new SnappyVariable(mainMethodParamId, "String[]");
     mainClass.addMethod("void", "main");
     mainClass.methods.get("main").addParameter(param);
+    classes.put(classId, mainClass);
     return mainClass;
   }
 
@@ -127,6 +128,7 @@ public class SymbolTable {
     public void addParameter(String type, String id) {
       parameters.put(id, new SnappyVariable(id, type));
     }
+
     public void addVariable(String type, String id) {
       variables.put(id, new SnappyVariable(id, type));
     }
