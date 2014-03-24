@@ -61,6 +61,11 @@ public class ErrorHandler {
         idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), location);
   }
 
+  public static void notAStatement(Token exprToken) {
+    //Error:(52, 13) java: not a statement
+    System.err.printf("Error:(%d, %d) java: not a statement", exprToken.getLine(), exprToken.getCharPositionInLine());
+  }
+
   private class Error {
 
     public Error() {
