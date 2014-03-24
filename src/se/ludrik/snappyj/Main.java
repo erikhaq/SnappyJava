@@ -39,10 +39,13 @@ public class Main {
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
-
-    for(c : symTable.classes.entrySet()) {
-
+    System.out.println("------------------------------------------");
+    System.out.println(symTable.mainClass);
+    for(SymbolTable.SnappyClass c : symTable.classes.values()) {
+      System.out.println(c);
     }
+    TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
+    typeCheckVisitor.visit(tree);
   }
 
 }

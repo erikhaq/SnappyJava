@@ -7,8 +7,13 @@ class Factorial2{
 }
 class Fac {
   int a;
-  boolean a;
-
+  Fac b;
+  public int[] DoWork(int h) {
+    int[] b;
+    int a;
+    boolean p;
+    return b;
+  }
     public int ComputeFac(int num){
 	int num_aux ;
 	if (num < 1)

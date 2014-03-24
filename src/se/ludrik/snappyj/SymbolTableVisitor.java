@@ -18,6 +18,7 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   }
   public SymbolTableVisitor(SymbolTable table) {
     symbolTable = table;
+
   }
 
 
@@ -33,8 +34,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
-    System.out.println(currentClass);
-    //return super.visitMainClass(ctx);
     currentClass = null;
     currentMethod = null;
     return null;
@@ -62,7 +61,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     String returnType = ctx.type().getText(), methodId = ctx.ID().getText();
-    //currentMethod = symbolTable.classes.get(currentClass.id).addMethod(returnType, methodId);
     currentMethod = currentClass.addMethod(returnType, methodId);
     //visit formallist here!!
     ctx.formalList().accept(this);
