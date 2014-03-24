@@ -107,7 +107,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
     String varName = ctx.ID().getText();
     SnappyType varType = null;
-
     if(currentMethod != null) {
       // declaration is a variable
       varType = currentMethod.variables.get(varName).type;
@@ -128,7 +127,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
     
-
+    return null;
   }
 
   @Override
@@ -255,7 +254,11 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
-    return super.visitLengthExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyType exprType = ctx.expr().accept(this);
+    if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
+      ErrorHandler.notAStatement(ctx.getStart());
+    }
+    return SnappyType.INT_ARRAY_TYPE;
   }
 
 
