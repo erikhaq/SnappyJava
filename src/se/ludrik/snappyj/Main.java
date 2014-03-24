@@ -59,6 +59,7 @@ public class Main {
     typeCheckVisitor.visit(tree);
 
   }
+  int x = new int[y];
 
 
 }
