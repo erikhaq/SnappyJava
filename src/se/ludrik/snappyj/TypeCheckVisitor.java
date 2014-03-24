@@ -55,30 +55,58 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
-    //TODO does return type exist
-    String returnType = ctx.type().getText();
-    if(!isValidType(returnType)) {
-      //TODO throw error no such type
+    String methodId = ctx.ID().getText();
+    currentMethod = currentClass.methods.get(methodId);
+    SnappyType returnType = currentMethod.returnType;
+
+    if(!isValidType(returnType.toString())) {
       ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
 
     }
+
+
     //Visit formalList
+    ctx.formalList().accept(this);
     //vist varDeclarations
+    for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
     // visit statmenets
+    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+      stmt.accept(this);
+    }
     //visit return expression
+    SnappyType returnExpr = ctx.expr().accept(this);
+    if(!returnType.equals(returnExpr)) {
+      // the return expression is not same as return type
+     ErrorHandler.incompatibleTypes(ctx.type().ID().getSymbol(), returnType.toString(), returnExpr.toString());
+    }
     //check return expression is same as return type
-    return null;
+    currentMethod = null;
+    return returnType;
   }
 
 
   @Override
   public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
-    String type = ctx.type().getText();
-    if(!isValidType(type)) {
-      // send error message here for no such symbol
-      ErrorHandler.missingSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+    String varName = ctx.ID().getText();
+    SnappyType varType = null;
+    if(currentClass != null) {
+      if(currentMethod != null) {
+        // declaration is a variable
+        varType = currentMethod.variables.get(varName).type;
+      } else {
+        // declaration is a field
+        varType = currentClass.fields.get(varName).type;
+      }
+
+      if(!isValidType(varType.toString())) {
+        // send error message here for no such symbol
+        ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+      }
     }
-    return new SnappyType(type);
+    return varType;
+    
   }
 
   @Override
