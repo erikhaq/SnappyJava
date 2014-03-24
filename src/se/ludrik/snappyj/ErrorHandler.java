@@ -13,12 +13,14 @@ public class ErrorHandler {
 
   public static void variableAlreadyDefinedInMethod(Token token, String methodName) {
     //Error:(40, 17) java: variable symTable is already defined in method init()
-    System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in method %s()\n", token.getLine(), token.getCharPositionInLine(), token.getText(), methodName);
+    System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in method %s()\n",
+        token.getLine(), token.getCharPositionInLine(), token.getText(), methodName);
   }
 
   public static void variableAlreadyDefinedInClass(Token token, String className) {
     //Error:(19, 27) java: variable lexer is already defined in class se.ludrik.snappyj.Main
-    System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in class %s\n", token.getLine(), token.getCharPositionInLine(), token.getText(), className);
+    System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in class %s\n",
+        token.getLine(), token.getCharPositionInLine(), token.getText(), className);
   }
 
   public static void classAlreadyDefined(Token token) {
@@ -31,7 +33,22 @@ public class ErrorHandler {
     //Error:(42, 12) java: incompatible types
     //required: boolean
     //found:    int
-    System.err.printf("Error:(%d, %d) java: incompatible types\n\t\t\t\t\trequired:\t%s\n\t\t\t\t\t\t found:\t%s\n", token.getLine(), token.getCharPositionInLine(), requiredType, foundType);
+    System.err.printf(
+        "Error:(%d, %d) java: incompatible types\n\trequired:\t%s\n\tfound:\t\t%s\n",
+        token.getLine(), token.getCharPositionInLine(), requiredType, foundType);
+  }
+
+  public static void missingSymbol(Token token, String location) {
+    //Error:(42, 5) java: cannot find symbol
+    //symbol:   variable bajs
+    //location: class se.ludrik.snappyj.Main
+
+    //Error:(43, 5) java: cannot find symbol
+    //symbol:   class Hora
+    //location: class se.ludrik.snappyj.Main
+    System.err.printf(
+        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\t%s\n\tlocation:\t%s\n",
+        token.getLine(), token.getCharPositionInLine(), token.getText(), location);
   }
 
   private class Error {
