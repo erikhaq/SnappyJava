@@ -79,7 +79,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnExpr = ctx.expr().accept(this);
     if(!returnType.equals(returnExpr)) {
       // the return expression is not same as return type
-     ErrorHandler.incompatibleTypes(ctx.type().ID().getSymbol(), returnType.toString(), returnExpr.toString());
+      ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
     }
     //check return expression is same as return type
     currentMethod = null;
@@ -132,7 +132,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-    String paramType = ctx.type().ID().getText();
+    String paramType = ctx.type().getText();
 
     if(!isValidType(paramType)) {
       ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
@@ -147,7 +147,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitFormalRest(@NotNull FormalRestContext ctx) {
-    String paramType = ctx.type().ID().getText();
+    String paramType = ctx.type().getText();
     if(!isValidType(paramType)) {
       ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
     }
