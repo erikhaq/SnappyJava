@@ -1,5 +1,7 @@
 package se.ludrik.snappyj;
 
+import org.antlr.v4.runtime.Token;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -118,10 +120,15 @@ public class SymbolTable {
 
     public void addParameter(SnappyVariable param) {
       parameters.put(param.id, param);
+
+
     }
 
-    public void addVariable(SnappyVariable variable) {
-      variables.put(variable.id, variable);
+    public void addParameter(String type, String id) {
+      parameters.put(id, new SnappyVariable(id, type));
+    }
+    public void addVariable(String type, String id) {
+      variables.put(id, new SnappyVariable(id, type));
     }
 
     public void setReturnType(String returnType) {
