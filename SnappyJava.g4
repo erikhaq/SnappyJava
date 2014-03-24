@@ -26,7 +26,7 @@ stmt: LBRACE (stmt)* RBRACE
 	| ID LBRACK expr RBRACK '=' expr ENDL
 	;	
 
-expr: expr op expr
+expr: expr op expr                      // Operator
 	| expr LBRACK expr RBRACK
 	| expr '.' LENGTH
 	| expr '.' ID LPAREN exprList RPAREN

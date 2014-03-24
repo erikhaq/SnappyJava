@@ -7,6 +7,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import se.ludrik.snappyj.SymbolTable.*;
+import se.ludrik.snappyj.objects.*;
 
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor{
   SnappyClass currentClass;

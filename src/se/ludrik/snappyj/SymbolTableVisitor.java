@@ -1,9 +1,8 @@
 package se.ludrik.snappyj;
 
-import java.util.List;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import se.ludrik.snappyj.SymbolTable.*;
+import se.ludrik.snappyj.objects.*;
 
 /**
  * Symbol table visitor
@@ -20,7 +19,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     symbolTable = table;
 
   }
-
 
   @Override public Object visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
     return super.visitProgram(ctx);
