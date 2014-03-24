@@ -1,14 +1,6 @@
 package se.ludrik.snappyj;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-
-import com.sun.xml.internal.bind.v2.TODO;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import se.ludrik.snappyj.SymbolTable.*;
 import se.ludrik.snappyj.objects.*;
 
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
@@ -20,7 +12,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     symbolTable = table;
 
   }
-  public boolean checkType(String type) {
+  public boolean isValidType(String type) {
     if(SnappyType.reservedTypes.contains(type)) return true;
     if(symbolTable.classes.containsKey(type)) return true;
     return false;
@@ -40,7 +32,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
     currentMethod = null;
     currentClass = null;
-    return new SnappyType("mainId");
+    return new SnappyType(mainId);
   }
 
   @Override
@@ -54,23 +46,27 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
       m.accept(this);
     }
+    currentClass = null;
+    return new SnappyType(classId);
 
 
   }
 
   @Override
   public SnappyType visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
-    return super.visitMethodDecl(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    return null;
   }
 
 
   @Override
   public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
-    if(!checkType(ctx.type().getText())) {
+    String type = ctx.type().getText();
+    if(!isValidType(type)) {
       // send error message here for no such symbol
-      //TODO
+      ErrorHandler.missingSymbol(ctx.type().ID().getSymbol(), currentClass.id);
     }
-    return null;
+    return new SnappyType(type);
   }
 
   @Override
