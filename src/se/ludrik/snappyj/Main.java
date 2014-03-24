@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import se.ludrik.snappyj.objects.*;
 
 /**
  * Main class
@@ -42,7 +43,7 @@ public class Main {
 
     System.out.println("------------------------------------------");
     //System.out.println(symTable.mainClass);
-    for(SymbolTable.SnappyClass c : symTable.classes.values()) {
+    for(SnappyClass c : symTable.classes.values()) {
       //System.out.println(c);
     }
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
