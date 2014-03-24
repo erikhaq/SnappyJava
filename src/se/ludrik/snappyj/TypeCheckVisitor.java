@@ -8,6 +8,7 @@ import com.sun.xml.internal.bind.v2.TODO;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import se.ludrik.snappyj.SymbolTable.*;
+import se.ludrik.snappyj.objects.*;
 
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   SnappyClass currentClass;
