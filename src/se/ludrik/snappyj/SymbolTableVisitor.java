@@ -34,15 +34,21 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
+
     currentClass = null;
     currentMethod = null;
     return null;
   }
 
-
-
   @Override public Object visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
-    currentClass = symbolTable.addClass(ctx.ID().getText());
+    String className = ctx.ID().getText();
+
+    if(symbolTable.classes.containsKey(className)) {
+      ErrorHandler.classAlreadyDefined(ctx.ID().getSymbol());
+      return null;
+    }
+
+    currentClass = symbolTable.addClass(className);
 
     for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
@@ -52,8 +58,8 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
       m.accept(this);
     }
 
-    System.out.println(currentClass);
-    System.out.println("num: " + currentClass.fields.size());
+    //System.out.println(currentClass);
+
     currentClass = null;
     return null;
     //return super.visitClassDecl(ctx);
@@ -92,16 +98,15 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
       if(currentMethod != null){
         // this variable belongs to a method.
         if(currentMethod.variables.containsKey(ctx.ID().getText())) {
-          ErrorHandler.variableAlreadyDeclared(ctx.ID().getSymbol());
+          ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
           return null;
         }
         currentMethod.addVariable(ctx.type().getText(), ctx.ID().getText());
-        System.out.println("THe token: " + ctx.ID().getSymbol().getText());
 
       } else {
         // we are not in the scope of a method so this variable must be a field
         if(currentClass.fields.containsKey(ctx.ID().getText())) {
-          ErrorHandler.variableAlreadyDeclared(ctx.ID().getSymbol());
+          ErrorHandler.variableAlreadyDefinedInClass(ctx.ID().getSymbol(), currentClass.id);
           return null;
         }
         currentClass.addField(ctx.ID().getText(), ctx.type().getText());
