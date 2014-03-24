@@ -81,7 +81,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnExpr = ctx.expr().accept(this);
     if(!returnType.equals(returnExpr)) {
       // the return expression is not same as return type
-      //ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
+      ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
     }
     //check return expression is same as return type
     currentMethod = null;
@@ -242,10 +242,10 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!SnappyType.reservedTypes.get(1).equals(exprType)) {
+    if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
       ErrorHandler.notAStatement(ctx.getStart());
     }
-    return new SnappyType("int[]");
+    return SnappyType.INT_ARRAY_TYPE;
   }
 
   @Override
