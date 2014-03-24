@@ -16,30 +16,31 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   public SymbolTableVisitor() {
     symbolTable = new SymbolTable();
   }
-
-  @Override public Object visitBoolLiterals(@NotNull SnappyJavaParser.BoolLiteralsContext ctx) {
-    return super.visitBoolLiterals(ctx);
+  public SymbolTableVisitor(SymbolTable table) {
+    symbolTable = table;
   }
 
-  @Override public Object visitOp(@NotNull SnappyJavaParser.OpContext ctx) {
-    return super.visitOp(ctx);
+
+  @Override public Object visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
+    return super.visitProgram(ctx);
   }
 
-  @Override public Object visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
-    return super.visitVarDecl(ctx);
+
+  @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
+    currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
+    currentMethod = currentClass.methods.get("main");
+
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+    System.out.println(currentClass);
+    //return super.visitMainClass(ctx);
+    currentClass = null;
+    currentMethod = null;
+    return null;
   }
 
-  @Override public Object visitStmt(@NotNull SnappyJavaParser.StmtContext ctx) {
-    return super.visitStmt(ctx);
-  }
 
-  @Override public Object visitExpr(@NotNull SnappyJavaParser.ExprContext ctx) {
-    return super.visitExpr(ctx);
-  }
-
-  @Override public Object visitType(@NotNull SnappyJavaParser.TypeContext ctx) {
-    return super.visitType(ctx);
-  }
 
   @Override public Object visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
     currentClass = symbolTable.addClass(ctx.ID().getText());
@@ -52,50 +53,64 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
       m.accept(this);
     }
 
+    System.out.println(currentClass);
+    System.out.println("num: " + currentClass.fields.size());
     currentClass = null;
     return null;
     //return super.visitClassDecl(ctx);
   }
 
-  @Override public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-    return super.visitFormalList(ctx);
-  }
-
-  @Override public Object visitExprRest(@NotNull SnappyJavaParser.ExprRestContext ctx) {
-    return super.visitExprRest(ctx);
-  }
-
-  @Override public Object visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
-    return super.visitProgram(ctx);
-  }
-
-  @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
-    currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
-    System.out.println(currentClass);
-    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
-      v.accept(this);
-    }
-    //return super.visitMainClass(ctx);
-    currentClass = null;
-    return null;
-  }
-
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     String returnType = ctx.type().getText(), methodId = ctx.ID().getText();
-    currentMethod = symbolTable.classes.get(currentClass.id).addMethod(returnType, methodId);
+    //currentMethod = symbolTable.classes.get(currentClass.id).addMethod(returnType, methodId);
+    currentMethod = currentClass.addMethod(returnType, methodId);
     //visit formallist here!!
-
+    ctx.formalList().accept(this);
     //visit vardeclr here!!
+    for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
     currentMethod = null;
     return null;
     //return super.visitMethodDecl(ctx);
   }
 
+
+  @Override public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
+    currentMethod.addParameter(ctx.type().getText(), ctx.ID().getText());
+    for(SnappyJavaParser.FormalRestContext r : ctx.formalRest()) {
+      r.accept(this);
+    }
+    return null;
+  }
   @Override public Object visitFormalRest(@NotNull SnappyJavaParser.FormalRestContext ctx) {
-    return super.visitFormalRest(ctx);
+    currentMethod.addParameter(ctx.type().getText(), ctx.ID().getText());
+    return null;
+  }
+  @Override public Object visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
+
+    if(currentClass != null) {
+
+      if(currentMethod != null){
+        // this variable belongs to a method.
+        if(currentMethod.variables.containsKey(ctx.ID().getText())) {
+          ErrorHandler.variableAlreadyDeclared(ctx.ID().getSymbol());
+          return null;
+        }
+        currentMethod.addVariable(ctx.type().getText(), ctx.ID().getText());
+        System.out.println("THe token: " + ctx.ID().getSymbol().getText());
+
+      } else {
+        // we are not in the scope of a method so this variable must be a field
+        if(currentClass.fields.containsKey(ctx.ID().getText())) {
+          ErrorHandler.variableAlreadyDeclared(ctx.ID().getSymbol());
+          return null;
+        }
+        currentClass.addField(ctx.ID().getText(), ctx.type().getText());
+
+      }
+    }
+    return null;
   }
 
-  @Override public Object visitExprList(@NotNull SnappyJavaParser.ExprListContext ctx) {
-    return super.visitExprList(ctx);
-  }
 }

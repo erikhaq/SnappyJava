@@ -36,8 +36,13 @@ public class Main {
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
     tree = parser.program();
-    SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();
+    SymbolTable symTable = new SymbolTable();
+    SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
+
+    for(c : symTable.classes.entrySet()) {
+
+    }
   }
 
 }
