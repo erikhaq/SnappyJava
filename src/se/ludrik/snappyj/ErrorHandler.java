@@ -1,14 +1,13 @@
 package se.ludrik.snappyj;
 
-import java.util.Locale;
 import org.antlr.v4.runtime.Token;
+
 
 /**
  * Created by erikhaq on 2014-03-21.
  */
 public class ErrorHandler {
   public ErrorHandler() {
-
   }
 
   public static void variableAlreadyDefinedInMethod(Token idToken, String methodName) {
@@ -44,17 +43,22 @@ public class ErrorHandler {
         idToken.getLine(), idToken.getCharPositionInLine(), requiredType, foundType);
   }
 
-  public static void missingSymbol(Token token, String location) {
-    //Error:(42, 5) java: cannot find symbol
-    //symbol:   variable bajs
-    //location: class se.ludrik.snappyj.Main
-
+  public static void missingClassSymbol(Token typeToken, String location) {
     //Error:(43, 5) java: cannot find symbol
     //symbol:   class Hora
     //location: class se.ludrik.snappyj.Main
     System.err.printf(
-        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\t%s\n\tlocation:\t%s\n",
-        token.getLine(), token.getCharPositionInLine(), token.getText(), location);
+        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tclass %s\n\tlocation:\t%s\n",
+        typeToken.getLine(), typeToken.getCharPositionInLine(), typeToken.getText(), location);
+  }
+
+  public static void missingVariableSymbol(Token idToken, String location) {
+    //Error:(42, 5) java: cannot find symbol
+    //symbol:   variable bajs
+    //location: class se.ludrik.snappyj.Main
+    System.err.printf(
+        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tvariable %s\n\tlocation:\t%s\n",
+        idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), location);
   }
 
   private class Error {
