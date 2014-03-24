@@ -8,6 +8,10 @@ import java.util.*;
 public class SnappyType {
   public String type;
   public static final List<String> reservedTypes = Arrays.asList("int", "int[]", "boolean");
+  public static final SnappyType INT_ARRAY_TYPE = new SnappyType("int[]");
+  public static final SnappyType INT_TYPE = new SnappyType("int");
+  public static final SnappyType BOOL_TYPE = new SnappyType("boolean");
+
   public SnappyType(String type) {
     this.type = type;
   }
