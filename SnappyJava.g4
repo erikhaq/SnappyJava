@@ -114,6 +114,8 @@ COMMENT     : '/*' .*? '*/' -> skip;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 
 // Helper tokens
-fragment LETTER : [a-zA-Z_] ;
-fragment DIGIT : [0-9] ;
+fragment LETTER
+  : [a-zA-Z_];
+fragment DIGIT
+  : [0-9];
 
