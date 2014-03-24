@@ -65,6 +65,11 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
   @Override public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     String returnType = ctx.type().getText(), methodId = ctx.ID().getText();
+    if(currentClass.methods.containsKey(methodId)) {
+      //TODO Method already defined. PRINT ERROR
+
+      return null;
+    }
     currentMethod = currentClass.addMethod(returnType, methodId);
     //visit formallist here!!
     ctx.formalList().accept(this);
@@ -79,6 +84,7 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
 
   @Override public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
+
     currentMethod.addParameter(ctx.type().getText(), ctx.ID().getText());
     for(SnappyJavaParser.FormalRestContext r : ctx.formalRest()) {
       r.accept(this);
@@ -86,6 +92,12 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     return null;
   }
   @Override public Object visitFormalRest(@NotNull SnappyJavaParser.FormalRestContext ctx) {
+    String paramName = ctx.ID().getText();
+    // check if param variable already exists.
+    if(currentMethod.parameters.containsKey(paramName)) {
+      ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
+      return null;
+    }
     currentMethod.addParameter(ctx.type().getText(), ctx.ID().getText());
     return null;
   }
