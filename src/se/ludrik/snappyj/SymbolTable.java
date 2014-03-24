@@ -93,7 +93,7 @@ public class SymbolTable {
   }
 
   // Type class
-  protected class SnappyType {
+  public class SnappyType {
     public String type;
 
     public SnappyType(String type) {

@@ -18,26 +18,26 @@ type: INT LBRACK RBRACK
 	| ID
 	;
 
-stmt: LBRACE (stmt)* RBRACE
-	| IF LPAREN expr RPAREN stmt ELSE stmt
-	| WHILE LPAREN expr RPAREN stmt
-	| SOUT LPAREN expr RPAREN ENDL 
-	| ID '=' expr ENDL
-	| ID LBRACK expr RBRACK '=' expr ENDL
+stmt: LBRACE (stmt)* RBRACE                 # Body
+	| IF LPAREN expr RPAREN stmt ELSE stmt  # If
+	| WHILE LPAREN expr RPAREN stmt         # While
+	| SOUT LPAREN expr RPAREN ENDL          # Sout
+	| ID '=' expr ENDL                      # Assign
+	| ID LBRACK expr RBRACK '=' expr ENDL   # ArrayAssign
 	;	
 
-expr: expr op expr
-	| expr LBRACK expr RBRACK
-	| expr '.' LENGTH
-	| expr '.' ID LPAREN exprList RPAREN
-	| NUM
-	| boolLiterals
-	| ID
-	| THIS
-	| NEW INT LBRACK expr RBRACK
-	| NEW ID LPAREN RPAREN
-	| '!' expr
-	| LPAREN expr RPAREN 
+expr: expr op expr 							# BinaryOp
+	| expr LBRACK expr RBRACK				# ArrayExp
+	| expr '.' LENGTH 						# LengthExp
+	| expr '.' ID LPAREN exprList RPAREN	# CallExp
+	| NUM 									# NumExp
+	| boolLiterals 							# BoolExp
+	| ID									# IdExp
+	| THIS 									# ThisExp
+	| NEW INT LBRACK expr RBRACK 			# NewIntExp
+	| NEW ID LPAREN RPAREN 					# NewIdExp
+	| '!' expr 								# NotExp
+	| LPAREN expr RPAREN 					# ParenExp
 	;
 
 op : 	'&&'
