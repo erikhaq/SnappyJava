@@ -132,14 +132,16 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-    String paramType = ctx.type().getText();
+    if(ctx.getChildCount() > 0) {
+      String paramType = ctx.type().getText();
 
-    if(!isValidType(paramType)) {
-      ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
-    }
+      if(!isValidType(paramType)) {
+        ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+      }
 
-    for(FormalRestContext formalRestContext : ctx.formalRest()) {
-      formalRestContext.accept(this);
+      for(FormalRestContext formalRestContext : ctx.formalRest()) {
+        formalRestContext.accept(this);
+      }
     }
 
     return null;
