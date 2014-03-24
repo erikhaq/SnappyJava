@@ -10,7 +10,7 @@ public class ErrorHandler {
 
   }
   public static void variableAlreadyDeclared(Token var) {
-   System.err.print("error at line " + var.getLine() + ": variable "+ var.getText() + " already declared\n");
+    System.err.println("Error:(" + var.getLine() + ", " + var.getCharPositionInLine() + ") java: variable '"+ var.getText() + "' already declared.");
   }
   private class Error {
 

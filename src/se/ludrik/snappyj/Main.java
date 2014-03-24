@@ -39,10 +39,10 @@ public class Main {
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
-
-    for(c : symTable.classes.entrySet()) {
-
-    }
+    //
+    //for(c : symTable.classes.entrySet()) {
+    //
+    //}
   }
 
 }
