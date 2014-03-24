@@ -1,13 +1,17 @@
 class Factorial2{
     public static void main(String[] a){
       int x;
-      int x;
+
 		System.out.println(new Fac().ComputeFac(10));
     }
 }
+
 class Fac {
   int a;
   Fac b;
+  public int bajs() {
+    return 3;
+  }
   public int[] DoWork(int h) {
     int[] b;
     int a;
@@ -25,10 +29,3 @@ class Fac {
 
 }
 
-class Fac {
-  int bajs;
-  int a;
-
-
-
-}

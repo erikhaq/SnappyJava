@@ -1,5 +1,6 @@
 package se.ludrik.snappyj;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import se.ludrik.snappyj.objects.*;
@@ -75,7 +76,9 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
 
   @Override public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-
+    if(ctx.getChildCount() == 0) {
+      return null;
+    }
     currentMethod.addParameter(ctx.type().getText(), ctx.ID().getText());
     for(SnappyJavaParser.FormalRestContext r : ctx.formalRest()) {
       r.accept(this);
