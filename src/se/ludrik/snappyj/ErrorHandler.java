@@ -11,31 +11,37 @@ public class ErrorHandler {
 
   }
 
-  public static void variableAlreadyDefinedInMethod(Token token, String methodName) {
+  public static void variableAlreadyDefinedInMethod(Token idToken, String methodName) {
     //Error:(40, 17) java: variable symTable is already defined in method init()
     System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in method %s()\n",
-        token.getLine(), token.getCharPositionInLine(), token.getText(), methodName);
+        idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), methodName);
   }
 
-  public static void variableAlreadyDefinedInClass(Token token, String className) {
+  public static void variableAlreadyDefinedInClass(Token idToken, String className) {
     //Error:(19, 27) java: variable lexer is already defined in class se.ludrik.snappyj.Main
     System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in class %s\n",
-        token.getLine(), token.getCharPositionInLine(), token.getText(), className);
+        idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), className);
   }
 
-  public static void classAlreadyDefined(Token token) {
+  public static void methodAlreadyDefined(Token idToken, String className) {
+    //Error:(63, 15) java: method init() is already defined in class se.ludrik.snappyj.Main
+    System.err.printf("Error:(%d, %d) java: method %s() is already defined in class %s\n",
+        idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), className);
+  }
+
+  public static void classAlreadyDefined(Token idToken) {
     //Error:(51, 8) java: duplicate class: se.ludrik.snappyj.Main
-    System.err.printf("Error:(%d, %d) java: duplicate class: %s\n", token.getLine(),
-        token.getCharPositionInLine(), token.getText());
+    System.err.printf("Error:(%d, %d) java: duplicate class: %s\n", idToken.getLine(),
+        idToken.getCharPositionInLine(), idToken.getText());
   }
 
-  public static void incompatibleTypes(Token token, String requiredType, String foundType) {
+  public static void incompatibleTypes(Token idToken, String requiredType, String foundType) {
     //Error:(42, 12) java: incompatible types
     //required: boolean
     //found:    int
     System.err.printf(
         "Error:(%d, %d) java: incompatible types\n\trequired:\t%s\n\tfound:\t\t%s\n",
-        token.getLine(), token.getCharPositionInLine(), requiredType, foundType);
+        idToken.getLine(), idToken.getCharPositionInLine(), requiredType, foundType);
   }
 
   public static void missingSymbol(Token token, String location) {
