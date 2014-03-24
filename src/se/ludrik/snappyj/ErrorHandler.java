@@ -48,7 +48,7 @@ public class ErrorHandler {
     //symbol:   class Hora
     //location: class se.ludrik.snappyj.Main
     System.err.printf(
-        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tclass %s\n\tlocation:\t%s\n",
+        "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tclass %s\n\tlocation:\tclass %s\n",
         typeToken.getLine(), typeToken.getCharPositionInLine(), typeToken.getText(), location);
   }
 
