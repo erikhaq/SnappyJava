@@ -22,7 +22,20 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     if(symbolTable.classes.containsKey(type)) return true;
     return false;
   }
+  public SnappyVariable getVariable(String var) {
+    // Try to get var from fields. If it does not exist it will return null
+    SnappyVariable v = currentClass.fields.get(var);
+    if(currentMethod != null) {
+      // check if variable is bound harder for method
+      if(currentMethod.parameters.containsKey(var)) {
+        v = currentMethod.parameters.get(var);
+      } else if(currentMethod.variables.containsKey(var)) {
+        v = currentMethod.variables.get(var);
+      }
+    }
 
+    return v;
+  }
   @Override
   public SnappyType visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     String mainId = ctx.ID().get(0).getText();
@@ -64,7 +77,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnType = currentMethod.returnType;
 
     if(!isValidType(returnType.toString())) {
-      ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+      ErrorHandler.missingClassSymbol(ctx.type().getStart(), currentClass.id);
 
     }
     //Visit formalList
@@ -79,6 +92,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     }
     //visit return expression
     SnappyType returnExpr = ctx.expr().accept(this);
+
     if(!returnType.equals(returnExpr)) {
       // the return expression is not same as return type
       ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
@@ -93,28 +107,28 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
     String varName = ctx.ID().getText();
     SnappyType varType = null;
-    if(currentClass != null) {
-      if(currentMethod != null) {
-        // declaration is a variable
-        varType = currentMethod.variables.get(varName).type;
-      } else {
-        // declaration is a field
-        varType = currentClass.fields.get(varName).type;
-      }
 
-      if(!isValidType(varType.toString())) {
-        // send error message here for no such symbol
-        ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
-      }
+    if(currentMethod != null) {
+      // declaration is a variable
+      varType = currentMethod.variables.get(varName).type;
+    } else {
+      // declaration is a field
+      varType = currentClass.fields.get(varName).type;
     }
+
+    if(!isValidType(varType.toString())) {
+      // send error message here for no such symbol
+      ErrorHandler.missingClassSymbol(ctx.type().getStart(), currentClass.id);
+    }
+
     return varType;
     
   }
 
   @Override
   public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
+    
 
-    return super.visitCallExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override
@@ -180,7 +194,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
-    return super.visitNumExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return SnappyType.INT_TYPE;
   }
 
   @Override
@@ -222,9 +236,9 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnType = null;
     String operator = ctx.getText();
     if(boolOperators.contains(operator)) {
-      returnType = new SnappyType("boolean");
+      returnType = SnappyType.BOOL_TYPE;
     } else if(intOperators.contains(operator)) {
-      returnType = new SnappyType("int");
+      returnType = SnappyType.INT_TYPE;
     }
     return returnType;
   }
@@ -244,10 +258,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return super.visitLengthExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
-  @Override
-  public SnappyType visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
-    return super.visitProgram(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-  }
+
 
   @Override
   public SnappyType visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
@@ -256,7 +267,15 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
-    return super.visitIdExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyType returnType = null;
+    String varName = ctx.ID().getText();
+    SnappyVariable var = getVariable(varName);
+    if(var == null) {
+      ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
+    } else {
+      returnType = var.type;
+    }
+    return returnType;
   }
 
   @Override

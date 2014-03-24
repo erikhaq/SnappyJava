@@ -40,7 +40,7 @@ public class Main {
   }
 
   public void init() throws IOException {
-    fIn = new FileInputStream("test.java");
+    fIn = new FileInputStream("ludwig_test.java");
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
     tokens = new CommonTokenStream(lexer);
@@ -59,5 +59,6 @@ public class Main {
     typeCheckVisitor.visit(tree);
 
   }
+
 
 }
