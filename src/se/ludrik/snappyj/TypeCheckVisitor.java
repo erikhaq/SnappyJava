@@ -1,6 +1,7 @@
 package se.ludrik.snappyj;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -14,36 +15,13 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   SnappyClass currentClass;
   SnappyMethod currentMethod;
   SymbolTable symbolTable;
-  List<String> reservedTypes;
-  public enum ReservedTypes {
-    INT("int"),
-    INT_ARRAY("int[]"),
-    BOOLEAN("boolean")
-    ;
-    private final String text;
-    private ReservedTypes(final String text) {
-      this.text = text;
-    }
 
-    @Override
-    public String toString() {
-      return this.text;
-    }
-  }
   public TypeCheckVisitor(SymbolTable table) {
     symbolTable = table;
 
-    reservedTypes = new ArrayList<String>();
-
-    for(ReservedTypes r : ReservedTypes.values()) {
-       reservedTypes.add(r.toString());
-    }
-
-
-
   }
   public boolean checkType(String type) {
-    if(reservedTypes.contains(type)) return true;
+    if(SnappyType.reservedTypes.contains(type)) return true;
     if(symbolTable.classes.containsKey(type)) return true;
     return false;
   }
@@ -67,7 +45,17 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
-    return super.visitClassDecl(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String classId = ctx.ID().getText();
+    currentClass = symbolTable.classes.get(classId);
+
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+    for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
+      m.accept(this);
+    }
+
+
   }
 
   @Override
