@@ -4,11 +4,15 @@ import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.objects.*;
 import se.ludrik.snappyj.SnappyJavaParser.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   SnappyClass currentClass;
   SnappyMethod currentMethod;
   SymbolTable symbolTable;
-
+  List<String> boolOperators = Arrays.asList("&&", "<",">", "<=", ">=");
+  List<String> intOperators = Arrays.asList("*", "+", "-");
   public TypeCheckVisitor(SymbolTable table) {
     symbolTable = table;
 
@@ -63,8 +67,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
       ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
 
     }
-
-
     //Visit formalList
     ctx.formalList().accept(this);
     //vist varDeclarations
@@ -185,8 +187,19 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitBinaryOp(@NotNull SnappyJavaParser.BinaryOpContext ctx) {
     SnappyJavaParser.ExprContext left = ctx.expr(0);
     SnappyJavaParser.ExprContext right = ctx.expr(1);
-    
-    return super.visitBinaryOp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    // get left and right expression type
+    SnappyType leftType = left.accept(this);
+    SnappyType rightType = right.accept(this);
+
+    // get type of operator
+    SnappyType returnType = ctx.op().accept(this);
+
+    // check that left and right hand side are of same type as operator
+    if(!leftType.equals(returnType) || !rightType.equals(returnType)) {
+      //TODO Throw error, not correct types
+    }
+    return returnType;
   }
 
   @Override
@@ -206,7 +219,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitOp(@NotNull SnappyJavaParser.OpContext ctx) {
-    return super.visitOp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyType returnType = null;
+    String operator = ctx.getText();
+    if(boolOperators.contains(operator)) {
+      returnType = new SnappyType("boolean");
+    } else if(intOperators.contains(operator)) {
+      returnType = new SnappyType("int");
+    }
+    return returnType;
   }
 
   @Override
@@ -241,8 +261,20 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
-    return super.visitArrayExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyType returnType = SnappyType.INT_TYPE;
+    // get type of the left expression
+    SnappyType leftType = ctx.expr(0).accept(this);
+    SnappyType innerType = ctx.expr(1).accept(this);
+
+    if(!leftType.equals(SnappyType.INT_ARRAY_TYPE)) {
+      //TODO ERROR, Left type must be of INT_ARRAY
+    }
+    if(!innerType.equals(SnappyType.INT_TYPE)){
+      //TODO ERROR, Inner must be of INT type
+    }
+    return returnType;
   }
+
 
   @Override
   public SnappyType visitSout(@NotNull SnappyJavaParser.SoutContext ctx) {
