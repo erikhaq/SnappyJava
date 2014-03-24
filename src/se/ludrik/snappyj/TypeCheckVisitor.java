@@ -2,6 +2,7 @@ package se.ludrik.snappyj;
 
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.objects.*;
+import se.ludrik.snappyj.SnappyJavaParser.*;
 
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   SnappyClass currentClass;
@@ -103,7 +104,26 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-    return super.visitFormalList(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String paramType = ctx.type().ID().getText();
+
+    if(!isValidType(paramType)) {
+      ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+    }
+
+    for(FormalRestContext formalRestContext : ctx.formalRest()) {
+      formalRestContext.accept(this);
+    }
+
+    return null;
+  }
+
+  @Override
+  public SnappyType visitFormalRest(@NotNull FormalRestContext ctx) {
+    String paramType = ctx.type().ID().getText();
+    if(!isValidType(paramType)) {
+      ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
+    }
+    return null;
   }
 
   @Override
@@ -119,11 +139,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitBoolExp(@NotNull SnappyJavaParser.BoolExpContext ctx) {
     return super.visitBoolExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public SnappyType visitFormalRest(@NotNull SnappyJavaParser.FormalRestContext ctx) {
-    return super.visitFormalRest(ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override
