@@ -41,9 +41,9 @@ public class Main {
     symbolTableVisitor.visit(tree);
 
     System.out.println("------------------------------------------");
-    System.out.println(symTable.mainClass);
+    //System.out.println(symTable.mainClass);
     for(SymbolTable.SnappyClass c : symTable.classes.values()) {
-      System.out.println(c);
+      //System.out.println(c);
     }
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);

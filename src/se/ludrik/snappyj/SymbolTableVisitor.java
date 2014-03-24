@@ -99,6 +99,9 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
         // this variable belongs to a method.
         if(currentMethod.variables.containsKey(ctx.ID().getText())) {
           ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
+          //ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), "boolean", "int"); //testar
+          //ErrorHandler.missingSymbol(ctx.ID().getSymbol(), "Main"); //testar
+
           return null;
         }
         currentMethod.addVariable(ctx.type().getText(), ctx.ID().getText());
