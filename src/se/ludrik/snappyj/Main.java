@@ -10,6 +10,15 @@ import se.ludrik.snappyj.objects.*;
 /**
  * Main class
  */
+
+/*
+  TODO:
+  TypeChecker:
+    visitMethodDeclaration: check if returnType exists
+    
+
+ */
+
 public class Main {
   private FileInputStream fIn;
   private ANTLRInputStream input;
