@@ -40,12 +40,13 @@ public class Main {
   }
 
   public void init() throws IOException {
-    fIn = new FileInputStream("test2.java");
+    fIn = new FileInputStream("test.java");
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
     tree = parser.program();
+
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
@@ -57,6 +58,8 @@ public class Main {
     }
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
+
+
 
   }
 
