@@ -3,7 +3,8 @@ import java.io.IOException;
 import se.ludrik.snappyj.*;
 
 /**
- * Created by erikhaq on 2014-03-25.
+ * Run from SnappyJava directory with:
+ * java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain test-files/file-name.java
  */
 public class JVMMain {
   public static void main(String[] args) {
