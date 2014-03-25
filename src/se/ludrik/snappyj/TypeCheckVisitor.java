@@ -120,6 +120,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     if(!returnType.equals(returnExpr)) {
       // the return expression is not same as return type
       ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
+
     }
     //check return expression is same as return type
     currentMethod = null;
@@ -153,7 +154,11 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
   @Override
   public SnappyType visitType(@NotNull SnappyJavaParser.TypeContext ctx) {
-    return super.visitType(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String type = ctx.getText();
+    if(!isValidType(type)) {
+      //TODO ERROR: No such type
+    }
+    return new SnappyType(type);
   }
 
   /*-------------------------------------- Statements ----------------------------------------------*/
@@ -198,8 +203,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType returnType = rightExp;
     if(left == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
-    } else if(!left.equals(rightExp)) {
-
+    } else if(!left.type.equals(rightExp)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), left.type.toString(), rightExp.type );
     } else {
       returnType = left.type;

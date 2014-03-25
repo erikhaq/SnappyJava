@@ -18,3 +18,5 @@ src/se/ludrik/snappyj/SnappyJavaParser.java
 src/se/ludrik/snappyj/SnappyJavaVisitor.java
 
 ludwig_test.java
+
+test2.java
