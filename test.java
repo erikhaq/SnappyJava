@@ -2,6 +2,7 @@ class Factorial2{
     public static void main(String[] a){
       int x;
       int[] array;
+      x = array.length;
 
 		System.out.println(new Fac().ComputeFac(10));
     }
