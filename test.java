@@ -2,6 +2,9 @@ class Factorial2{
     public static void main(String[] a){
       int x;
       int[] array;
+      Fac b;
+      b = new Fac();
+      array = b.DoWork(x);
 
 		System.out.println(new Fac().ComputeFac(10));
     }
@@ -28,9 +31,5 @@ class Fac {
 	    num_aux = num * (this.ComputeFac(num-1)) ;
 	return num_aux ;
     }
-
-}
-
-class Fac {
 
 }
