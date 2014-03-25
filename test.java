@@ -5,8 +5,8 @@ class Factorial2{
       Fac b;
       x = array.length;
       b = new Fac();
-      array = b.DoWork(x);
-
+      array = b.DoWork(x,3, 3);
+      x = 1 + 2 * 4;
 		System.out.println(new Fac().ComputeFac(10));
     }
 }
@@ -17,7 +17,7 @@ class Fac {
   public int bajs() {
     return 3;
   }
-  public int[] DoWork(int h) {
+  public int[] DoWork(int h, int hej, int abba) {
     int[] b;
     int a;
     boolean p;

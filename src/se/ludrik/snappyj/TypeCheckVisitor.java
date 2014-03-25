@@ -38,6 +38,8 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
     return v;
   }
+
+
   @Override
   public SnappyType visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     String mainId = ctx.ID().get(0).getText();
@@ -201,6 +203,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
     SnappyVariable left = getVariable(ctx.ID().getText());
     SnappyType rightExp = ctx.expr().accept(this);
+
     if(left == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else if(!left.type.equals(rightExp)) {
@@ -232,24 +235,56 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return null;
   }
  /* ------------------------------------- Expressions ---------------------------------------------- */
-  @Override
-  public SnappyType visitBinaryOp(@NotNull SnappyJavaParser.BinaryOpContext ctx) {
-
-    SnappyJavaParser.ExprContext left = ctx.expr(0);
-    SnappyJavaParser.ExprContext right = ctx.expr(1);
-
-    // get left and right expression type
-    SnappyType leftType = left.accept(this);
-    SnappyType rightType = right.accept(this);
-
-    // get type of operator
-    SnappyType returnType = ctx.op().accept(this);
-
-    // check that left and right hand side are of same type as operator
-    if(!leftType.equals(returnType) || !rightType.equals(returnType)) {
-     //TODO Throw error, not correct types
+  public void doOpCheck(ExprContext leftCtx, ExprContext rightCtx, SnappyType opType) {
+    SnappyType leftType = leftCtx.accept(this);
+    SnappyType rightType = rightCtx.accept(this);
+    if(!leftType.equals(opType)) {
+      ErrorHandler.incompatibleTypes(leftCtx.getStart(),opType.type, leftType.type );
     }
-    return returnType;
+    if(!rightType.equals(opType)) {
+      ErrorHandler.incompatibleTypes(rightCtx.getStart(),opType.type, rightType.type );
+    }
+  }
+
+  @Override
+  public SnappyType visitMultiOp(@NotNull MultiOpContext ctx) {
+
+
+    doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
+
+    return SnappyType.INT_TYPE;
+  }
+
+  @Override
+  public SnappyType visitAddSubOp(@NotNull AddSubOpContext ctx) {
+
+    doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
+
+    return SnappyType.INT_TYPE;
+  }
+
+  @Override
+  public SnappyType visitLTComp(@NotNull LTCompContext ctx) {
+
+    doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
+
+    return SnappyType.BOOL_TYPE;
+  }
+
+  @Override
+  public SnappyType visitGTComp(@NotNull GTCompContext ctx) {
+
+    doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
+
+    return SnappyType.BOOL_TYPE;
+  }
+
+  @Override
+  public SnappyType visitAndComp(@NotNull AndCompContext ctx) {
+    SnappyType opType = SnappyType.BOOL_TYPE;
+    doOpCheck(ctx.expr(0), ctx.expr(1), opType);
+
+    return opType;
   }
 
   @Override
@@ -279,28 +314,55 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
-    SnappyType returnType = null;
+    SnappyType returnType = new SnappyType("Not defined");
     SnappyType classType = ctx.expr().accept(this);
+
     if(classType == null) {
       //TODO: ERROR, LEFTHAND NOT DEFINED
     } else if(symbolTable.classes.containsKey(classType.type)) {
-
       SnappyClass leftClass = symbolTable.classes.get(classType.type);
       String methodName = ctx.ID().getText();
       if(!leftClass.methods.containsKey(methodName)) {
         //TODO ERROR, NO SUCH METHOD IN CLASS LeftClass
 
       } else {
-        // check that paramterers in exprlist are of same type as declared in method methodName
+
+        // check that parameters in exprlist are of same type as declared in method methodName
         SnappyMethod method = leftClass.methods.get(methodName);
-        ArrayList<SnappyVariable> declaredParams = new ArrayList<SnappyVariable>(method.parameters.values());
-        
+        returnType = method.returnType;
+        // First check that number of parameters defined in method is same as inserted in current method call
+        // Also don't enter block if there are no parameters to check.
+        if(method.parameters.size() == ctx.exprList().getChildCount() && method.parameters.size() > 0) {
+          // Get all declared parameters from method
+          ArrayList<SnappyVariable> declaredParams = new ArrayList<SnappyVariable>(method.parameters.values());
+          // get first input type and first declared type
+          SnappyType currInputType = ctx.exprList().expr().accept(this);
+          SnappyType currDeclType = declaredParams.get(0).type;
 
+          // check that they are of the same type
+          if(!currInputType.equals(currDeclType)) {
+            //TODO Error, input type does not match declared type
+            ErrorHandler.incompatibleTypes(ctx.exprList().expr().getStart(), currDeclType.type, currInputType.type);
+          }
+          // Get the rest of the input parameters from exprRest
+          List<ExprRestContext> inputParams = ctx.exprList().exprRest();
+
+          // loop through all input parameters and check that they are of same type as defined for current method.
+          for(int i = 0; i < inputParams.size(); i++) {
+            currInputType = inputParams.get(i).accept(this);
+            currDeclType = declaredParams.get(i+1).type;
+            if(!currInputType.equals(currDeclType)) {
+              //ERROR
+              ErrorHandler.incompatibleTypes(inputParams.get(i).getStart(), currDeclType.type, currInputType.type);
+            }
+          }
+        } else {
+          //TODO Error, input parameters does not match method declaration
+        }
       }
-
-    } else {
-      //TODO Incorrect left expression
     }
+
+
     return returnType;
   }
 
@@ -334,13 +396,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitNewIntExp(@NotNull SnappyJavaParser.NewIntExpContext ctx) {
+  public SnappyType visitNewIntArrayExp(@NotNull NewIntArrayExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(exprType.equals(SnappyType.INT_TYPE)) {
+    if(!exprType.equals(SnappyType.INT_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, exprType.type);
     }
     return SnappyType.INT_ARRAY_TYPE;
   }
+
 
   @Override
   public SnappyType visitNewIdExp(@NotNull SnappyJavaParser.NewIdExpContext ctx) {
