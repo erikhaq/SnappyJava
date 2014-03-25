@@ -33,21 +33,21 @@ stmt
   ; 
 
 expr
-  : expr MUL expr                         # MultiOp
+  : expr LBRACK expr RBRACK               # ArrayExp
+  | expr '.' ID LPAREN exprList RPAREN    # CallExp
+  | expr '.' LENGTH                       # LengthExp
+  | '!' expr                              # NotExp
+  | NEW INT LBRACK expr RBRACK            # NewIntArrayExp
+  | NEW ID LPAREN RPAREN                  # NewIdExp
+  | expr MUL expr                         # MultiOp
   | expr (ADD|SUB) expr                   # AddSubOp
   | expr (LT|LTE) expr                    # LTComp
   | expr (GT|GTE) expr                    # GTComp
   | expr AND expr                         # AndComp
-  | expr LBRACK expr RBRACK               # ArrayExp
-  | expr '.' LENGTH                       # LengthExp
-  | expr '.' ID LPAREN exprList RPAREN    # CallExp
   | NUM                                   # NumExp
   | boolLiterals                          # BoolExp
   | ID                                    # IdExp
   | THIS                                  # ThisExp
-  | NEW INT LBRACK expr RBRACK            # NewIntArrayExp
-  | NEW ID LPAREN RPAREN                  # NewIdExp
-  | '!' expr                              # NotExp
   | LPAREN expr RPAREN                    # ParenExp
   ;
 
