@@ -46,6 +46,7 @@ public class Main {
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
     tree = parser.program();
+
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
@@ -57,6 +58,8 @@ public class Main {
     }
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
+
+
 
   }
 
