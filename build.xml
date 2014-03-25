@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="snappyjava" basedir="." default="main">
+<project name="mjc" basedir="." default="main">
 
   <!-- properties -->
   <property name="src.dir"     value="src"/>
@@ -7,7 +7,7 @@
   <property name="build.dir"   value="build"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
   <property name="jar.dir"     value="${build.dir}/jar"/>
-  <property name="main-class"  value="se.ludrik.snappyj.JVMMain"/>
+  <property name="main-class"  value="mjc.JVMMain"/>
 
   <!-- paths -->
   <path id="classpath">
@@ -22,16 +22,16 @@
   <!-- compile target -->
   <target name="compile">
     <mkdir dir="${classes.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false"/>
   </target>
 
   <!-- jar target -->
   <target name="jar" depends="compile">
     <mkdir dir="${jar.dir}"/>
     <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
-      <manifest>
+      <!--<manifest>
         <attribute name="Main-Class" value="${main-class}"/>
-      </manifest>
+      </manifest>-->
     </jar>
   </target>
 
@@ -49,6 +49,7 @@
   <target name="clean-build" depends="clean,jar"/>
 
   <!-- main target -->
-  <target name="main" depends="clean,run"/>
+  <target name="main" depends="clean,jar"/>
+  <!--<target name="main" depends="clean,run"/>-->
 
 </project>

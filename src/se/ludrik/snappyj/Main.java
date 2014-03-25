@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import se.ludrik.snappyj.objects.*;
 
 /**
- * JVMMain class
+ * Main class
  */
 
 /*
@@ -19,7 +19,7 @@ import se.ludrik.snappyj.objects.*;
 
  */
 
-public class JVMMain {
+public class Main {
   private FileInputStream fIn;
   private ANTLRInputStream input;
   private SnappyJavaLexer lexer;
@@ -27,25 +27,26 @@ public class JVMMain {
   private SnappyJavaParser parser;
   private ParseTree tree;
 
-  public JVMMain() throws IOException {
-    init();
+  public Main(String fileName) throws IOException {
+    init(fileName);
   }
 
-  public static void main(String[] args) {
+  /*public static void main(String[] args) {
     try {
-      new JVMMain();
+      new Main();
     } catch (IOException e) {
       e.printStackTrace();
     }
-  }
+  }*/
 
-  public void init() throws IOException {
-    fIn = new FileInputStream("test.java");
+  public void init(String fileName) throws IOException {
+    fIn = new FileInputStream(fileName);
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
     tree = parser.program();
+
 
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
