@@ -33,7 +33,11 @@ stmt
   ; 
 
 expr
-  : expr op expr                          # BinaryOp
+  : expr MUL expr                         # MultiOp
+  | expr (ADD|SUB) expr                   # AddSubOp
+  | expr (LT|LTE) expr                    # LTComp
+  | expr (GT|GTE) expr                    # GTComp
+  | expr AND expr                         # AndComp
   | expr LBRACK expr RBRACK               # ArrayExp
   | expr '.' LENGTH                       # LengthExp
   | expr '.' ID LPAREN exprList RPAREN    # CallExp
@@ -41,7 +45,7 @@ expr
   | boolLiterals                          # BoolExp
   | ID                                    # IdExp
   | THIS                                  # ThisExp
-  | NEW INT LBRACK expr RBRACK            # NewIntExp
+  | NEW INT LBRACK expr RBRACK            # NewIntArrayExp
   | NEW ID LPAREN RPAREN                  # NewIdExp
   | '!' expr                              # NotExp
   | LPAREN expr RPAREN                    # ParenExp
@@ -102,11 +106,13 @@ COMMA       : ',';
 
 // Operators
 AND         : '&&';
-LT          : '<';
-GT          : '>';
-ADD         : '+';
-SUB         : '-';
-MUL         : '*';
+LT          : '<' ;
+LTE         : '<=';
+GT          : '>' ;
+GTE         : '>=';
+ADD         : '+' ;
+SUB         : '-' ;
+MUL         : '*' ;
 
 // Misc
 ID          : LETTER (LETTER|DIGIT)*;
