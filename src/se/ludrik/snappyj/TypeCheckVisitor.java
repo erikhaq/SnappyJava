@@ -193,22 +193,20 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
   @Override
   public SnappyType visitSout(@NotNull SnappyJavaParser.SoutContext ctx) {
-    return super.visitSout(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    ctx.expr().accept(this);
+    return null;
   }
 
   @Override
   public SnappyType visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
     SnappyVariable left = getVariable(ctx.ID().getText());
     SnappyType rightExp = ctx.expr().accept(this);
-    SnappyType returnType = rightExp;
     if(left == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else if(!left.type.equals(rightExp)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), left.type.toString(), rightExp.type );
-    } else {
-      returnType = left.type;
     }
-    return returnType;
+    return null;
 
   }
 
@@ -219,46 +217,24 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType assingExp = ctx.expr(1).accept(this);
     if(id == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
+    } else if(!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
+      // the left hand side identifier is not of type INT_ARRAY!
+      ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), SnappyType.INT_ARRAY_TYPE.type, id.type.toString());
     }
+    // check that inner expression is of type INT_TYPE
     if(!innerExp.equals(SnappyType.INT_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_TYPE.type, innerExp.type);
     }
+    // check that the right hand side is of type INT_ARRAY
     if(!assingExp.equals(SnappyType.INT_ARRAY_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_ARRAY_TYPE.type, assingExp.type);
     }
-    return SnappyType.INT_ARRAY_TYPE;
+    return null;
   }
  /* ------------------------------------- Expressions ---------------------------------------------- */
   @Override
-  public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
-    SnappyType returnType = null;
-    SnappyType classType = ctx.expr().accept(this);
-    if(classType == null) {
-      //TODO: ERROR, LEFTHA
-    } else if(symbolTable.classes.containsKey(classType.type)) {
-        SnappyClass leftClass = symbolTable.classes.get(classType.type);
-      String methodName = ctx.ID().getText();
-      if(!leftClass.methods.containsKey(methodName)) {
-        //TODO ERROR, NO SUCH METHOD IN CLASS LeftClass
-      } else {
-        //SnappyClass tmpClass = currentClass;
-        SnappyMethod tmpMethod = currentMethod;
-        currentMethod = leftClass.methods.get(methodName);
-        //currentClass = leftClass;
-        returnType = leftClass.methods.get(methodName).returnType;
-        ctx.exprList().accept(this);
-        currentMethod = tmpMethod;
-        //currentClass = tmpClass;
-      }
-
-    } else {
-      //TODO Incorrect left expression
-    }
-    return returnType;
-  }
-
-  @Override
   public SnappyType visitBinaryOp(@NotNull SnappyJavaParser.BinaryOpContext ctx) {
+
     SnappyJavaParser.ExprContext left = ctx.expr(0);
     SnappyJavaParser.ExprContext right = ctx.expr(1);
 
@@ -271,74 +247,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
     // check that left and right hand side are of same type as operator
     if(!leftType.equals(returnType) || !rightType.equals(returnType)) {
-      //TODO Throw error, not correct types
-    }
-    return returnType;
-  }
-
-
-
-
-  @Override
-  public SnappyType visitBoolExp(@NotNull SnappyJavaParser.BoolExpContext ctx) {
-    return SnappyType.BOOL_TYPE;
-  }
-
-  @Override
-  public SnappyType visitThisExp(@NotNull SnappyJavaParser.ThisExpContext ctx) {
-    return new SnappyType(currentClass.id);
-  }
-
-  @Override
-  public SnappyType visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
-    return ctx.expr().accept(this);
-  }
-
-  @Override
-  public SnappyType visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
-    return SnappyType.INT_TYPE;
-  }
-
-  @Override
-  public SnappyType visitNotExp(@NotNull SnappyJavaParser.NotExpContext ctx) {
-    SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.BOOL_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type );
-    }
-    return SnappyType.BOOL_TYPE;
-  }
-
-  @Override
-  public SnappyType visitNewIntExp(@NotNull SnappyJavaParser.NewIntExpContext ctx) {
-    SnappyType exprType = ctx.expr().accept(this);
-    if(exprType.equals(SnappyType.INT_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, exprType.type);
-    }
-    return SnappyType.INT_ARRAY_TYPE;
-  }
-
-
-
-  @Override
-  public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
-    SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
-      ErrorHandler.notAStatement(ctx.getStart());
-    }
-    return SnappyType.INT_TYPE;
-  }
-
-
-
-  @Override
-  public SnappyType visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
-    String varName = ctx.ID().getText();
-    SnappyType returnType = new SnappyType(varName);
-    SnappyVariable var = getVariable(varName);
-    if(var == null) {
-      ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
-    } else {
-      returnType = var.type;
+     //TODO Throw error, not correct types
     }
     return returnType;
   }
@@ -360,6 +269,80 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
+  public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
+    SnappyType exprType = ctx.expr().accept(this);
+    if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
+      ErrorHandler.notAStatement(ctx.getStart());
+    }
+    return SnappyType.INT_TYPE;
+  }
+
+  @Override
+  public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
+    SnappyType returnType = null;
+    SnappyType classType = ctx.expr().accept(this);
+    if(classType == null) {
+      //TODO: ERROR, LEFTHAND NOT DEFINED
+    } else if(symbolTable.classes.containsKey(classType.type)) {
+
+      SnappyClass leftClass = symbolTable.classes.get(classType.type);
+      String methodName = ctx.ID().getText();
+      if(!leftClass.methods.containsKey(methodName)) {
+        //TODO ERROR, NO SUCH METHOD IN CLASS LeftClass
+
+      } else {
+        // check that paramterers in exprlist are of same type as declared in method methodName
+        SnappyMethod method = leftClass.methods.get(methodName);
+        ArrayList<SnappyVariable> declaredParams = new ArrayList<SnappyVariable>(method.parameters.values());
+        
+
+      }
+
+    } else {
+      //TODO Incorrect left expression
+    }
+    return returnType;
+  }
+
+
+  @Override
+  public SnappyType visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
+    return SnappyType.INT_TYPE;
+  }
+
+  @Override
+  public SnappyType visitBoolExp(@NotNull SnappyJavaParser.BoolExpContext ctx) {
+    return SnappyType.BOOL_TYPE;
+  }
+
+  @Override
+  public SnappyType visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
+    String varName = ctx.ID().getText();
+    SnappyType returnType = new SnappyType(varName);
+    SnappyVariable var = getVariable(varName);
+    if(var == null) {
+      ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
+    } else {
+      returnType = var.type;
+    }
+    return returnType;
+  }
+
+  @Override
+  public SnappyType visitThisExp(@NotNull SnappyJavaParser.ThisExpContext ctx) {
+    return new SnappyType(currentClass.id);
+  }
+
+  @Override
+  public SnappyType visitNewIntExp(@NotNull SnappyJavaParser.NewIntExpContext ctx) {
+    SnappyType exprType = ctx.expr().accept(this);
+    if(exprType.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, exprType.type);
+    }
+    return SnappyType.INT_ARRAY_TYPE;
+  }
+
+  @Override
   public SnappyType visitNewIdExp(@NotNull SnappyJavaParser.NewIdExpContext ctx) {
     String className = ctx.ID().getText();
     SnappyType returnType = new SnappyType(className);
@@ -367,6 +350,22 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
       ErrorHandler.missingClassSymbol(ctx.ID().getSymbol(), currentMethod.id);
     }
     return returnType;
+  }
+
+
+  @Override
+  public SnappyType visitNotExp(@NotNull SnappyJavaParser.NotExpContext ctx) {
+    SnappyType exprType = ctx.expr().accept(this);
+    if(!exprType.equals(SnappyType.BOOL_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type );
+    }
+    return SnappyType.BOOL_TYPE;
+  }
+
+
+  @Override
+  public SnappyType visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
+    return ctx.expr().accept(this);
   }
   /* ------------------------------------------------ OPERATORS -------------------------------------------- */
   @Override
