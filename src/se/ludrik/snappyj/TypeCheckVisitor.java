@@ -361,8 +361,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
         }
       }
     }
-
-
     return returnType;
   }
 
@@ -444,34 +442,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   /* ---------------------------------------- Expression List ----------------------------------------------*/
-  @Override
-  public SnappyType visitExprList(@NotNull SnappyJavaParser.ExprListContext ctx) {
 
-    if(ctx.getChildCount() > 0) {
-      // there are expressions to evaluate against method parameters
-      ArrayList<SnappyVariable> allVariables = new ArrayList<SnappyVariable>(currentMethod.parameters.values());
-      SnappyVariable var = allVariables.get(0);
-      SnappyType currType = ctx.expr().accept(this);
-      if(!var.type.equals(currType)) {
-        ErrorHandler.incompatibleTypes(ctx.expr().getStart(), var.type.toString(), currType.type.toString());
-      }
-      if(allVariables.size()-1 != ctx.exprRest().size()){
-        // Check if method call has as many parameters as declared
-        //TODO THROW ERROR THAT METHOD CALL DOES NOT MATCH.
-      } else {
-        for(int i = 0; i < ctx.exprRest().size(); i++) {
-          var = allVariables.get(i+1);
-          currType = ctx.exprRest(i).accept(this);
-          if(!var.type.equals(currType)) {
-            ErrorHandler.incompatibleTypes(ctx.exprRest(i).getStart(), var.type.toString(), currType.type.toString());
-          }
-        }
-
-      }
-
-    }
-    return null;
-  }
   @Override
   public SnappyType visitExprRest(@NotNull SnappyJavaParser.ExprRestContext ctx) {
     return ctx.expr().accept(this);
