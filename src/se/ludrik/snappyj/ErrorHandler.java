@@ -17,19 +17,19 @@ public class ErrorHandler {
   }
 
   public static void variableAlreadyDefinedInClass(Token idToken, String className) {
-    //Error:(19, 27) java: variable lexer is already defined in class se.ludrik.snappyj.Main
+    //Error:(19, 27) java: variable lexer is already defined in class se.ludrik.snappyj.JVMMain
     System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in class %s\n",
         idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), className);
   }
 
   public static void methodAlreadyDefined(Token idToken, String className) {
-    //Error:(63, 15) java: method init() is already defined in class se.ludrik.snappyj.Main
+    //Error:(63, 15) java: method init() is already defined in class se.ludrik.snappyj.JVMMain
     System.err.printf("Error:(%d, %d) java: method %s() is already defined in class %s\n",
         idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), className);
   }
 
   public static void classAlreadyDefined(Token idToken) {
-    //Error:(51, 8) java: duplicate class: se.ludrik.snappyj.Main
+    //Error:(51, 8) java: duplicate class: se.ludrik.snappyj.JVMMain
     System.err.printf("Error:(%d, %d) java: duplicate class: %s\n", idToken.getLine(),
         idToken.getCharPositionInLine(), idToken.getText());
   }
@@ -46,7 +46,7 @@ public class ErrorHandler {
   public static void missingClassSymbol(Token typeToken, String location) {
     //Error:(43, 5) java: cannot find symbol
     //symbol:   class Hora
-    //location: class se.ludrik.snappyj.Main
+    //location: class se.ludrik.snappyj.JVMMain
     System.err.printf(
         "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tclass %s\n\tlocation:\tclass %s\n",
         typeToken.getLine(), typeToken.getCharPositionInLine(), typeToken.getText(), location);
@@ -55,7 +55,7 @@ public class ErrorHandler {
   public static void missingVariableSymbol(Token idToken, String location) {
     //Error:(42, 5) java: cannot find symbol
     //symbol:   variable bajs
-    //location: class se.ludrik.snappyj.Main
+    //location: class se.ludrik.snappyj.JVMMain
     System.err.printf(
         "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tvariable %s\n\tlocation:\t%s\n",
         idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), location);
@@ -63,7 +63,8 @@ public class ErrorHandler {
 
   public static void notAStatement(Token exprToken) {
     //Error:(52, 13) java: not a statement
-    System.err.printf("Error:(%d, %d) java: not a statement", exprToken.getLine(), exprToken.getCharPositionInLine());
+    System.err.printf("Error:(%d, %d) java: not a statement", exprToken.getLine(),
+        exprToken.getCharPositionInLine());
   }
 
   private class Error {
