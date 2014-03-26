@@ -1,14 +1,21 @@
 package se.ludrik.snappyj;
 
 import mjc.JVMMain;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import mjc.JVMMain.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.antlr.v4.runtime.misc.Nullable;
+
+import java.util.BitSet;
 
 
 /**
  * Created by erikhaq on 2014-03-21.
  */
-public class ErrorHandler {
+public class ErrorHandler extends BaseErrorListener{
+  public static ErrorHandler INSTANCE = new ErrorHandler();
   private static boolean errorDetected;
   public ErrorHandler() {
     errorDetected = false;
@@ -43,22 +50,24 @@ public class ErrorHandler {
     setErrorDetected();
   }
   public static void noSuchMethod(Token methodIdToken, String className) {
-    System.err.printf("Error:(%d, %d) java: no such method %s() defined in class %s\n",
+    if(JVMMain.printErrors) System.err.printf("Error:(%d, %d) java: no such method %s() defined in class %s\n",
             methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(), className);
+    setErrorDetected();
   }
   public static void invalidMethodParams(Token methodIdToken, String className, String requiredType, String foundType) {
     //Error(73, 14)java: method count in class se.ludrik.snappyj.Main.Lek cannot be applied to given types;
     //required: int
     //found: boolean
-    System.err.printf(
+    if(JVMMain.printErrors) System.err.printf(
             "Error:(%d, %d) java: method %s in class %s cannot be applied to given types\n\trequired:\t%s\n\tfound:\t\t%s\n",
             methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(),className ,requiredType, foundType);
-
+    setErrorDetected();
   }
   public static void invalidMethodParamSize(Token methodIdToken, String className) {
-    System.err.printf(
+    if(JVMMain.printErrors) System.err.printf(
             "Error:(%d, %d) java: number of input parameters of method %s in class %s does not match number declared\n",
             methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(), className);
+    setErrorDetected();
   }
   public static void classAlreadyDefined(Token idToken) {
     //Error:(51, 8) java: duplicate class: se.ludrik.snappyj.Main
@@ -67,8 +76,9 @@ public class ErrorHandler {
     setErrorDetected();
   }
   public static void notAnumber(Token idToken) {
-    System.err.printf("Error:(%d, %d) java: %s could not be parsed to int",
+    if(JVMMain.printErrors)System.err.printf("Error:(%d, %d) java: %s could not be parsed to int",
             idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText());
+    setErrorDetected();
   }
   public static void incompatibleTypes(Token idToken, String requiredType, String foundType) {
     //Error:(42, 12) java: incompatible types
@@ -107,4 +117,11 @@ public class ErrorHandler {
     setErrorDetected();
   }
 
+  @Override
+  public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
+    
+    if(JVMMain.printErrors) System.err.printf("line %d:%d: %s\n", line, charPositionInLine, msg);
+    setErrorDetected();
+
+  }
 }
