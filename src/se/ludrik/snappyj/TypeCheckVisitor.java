@@ -158,7 +158,10 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitType(@NotNull SnappyJavaParser.TypeContext ctx) {
     String type = ctx.getText();
     if(!isValidType(type)) {
-      //TODO ERROR: No such type
+      //ERROR: No such type
+      System.err.printf("Error:(%d, %d) java: no such type exists: %s\n",
+              ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
+
     }
     return new SnappyType(type);
   }
@@ -295,10 +298,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType innerType = ctx.expr(1).accept(this);
 
     if(!leftType.equals(SnappyType.INT_ARRAY_TYPE)) {
-      //TODO ERROR, Left type must be of INT_ARRAY
+      // ERROR, Left type must be of INT_ARRAY
+      System.err.println("Left type must be of type int[]");
+      ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_ARRAY_TYPE.type, leftType.type);
     }
     if(!innerType.equals(SnappyType.INT_TYPE)){
-      //TODO ERROR, Inner must be of INT type
+      // ERROR, Inner must be of INT type
+      System.err.println("inner type must be of type int");
+      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type, innerType.type);
     }
     return returnType;
   }
@@ -316,16 +323,17 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
     SnappyType returnType = new SnappyType("Not defined");
     SnappyType classType = ctx.expr().accept(this);
-
+    ArrayList<String> requiredParamTypes = new ArrayList<String>();
+    ArrayList<String> foundParamTypes = new ArrayList<String>();
+    boolean foundError = false;
     if(classType == null) {
-      //TODO: ERROR, LEFTHAND NOT DEFINED
       ErrorHandler.missingClassSymbol(ctx.expr().getStart(), currentMethod.id);
     } else if(symbolTable.classes.containsKey(classType.type)) {
       SnappyClass leftClass = symbolTable.classes.get(classType.type);
       String methodName = ctx.ID().getText();
       if(!leftClass.methods.containsKey(methodName)) {
-        //TODO ERROR, NO SUCH METHOD IN CLASS LeftClass
 
+        ErrorHandler.noSuchMethod(ctx.ID().getSymbol(), classType.type);
       } else {
 
         // check that parameters in exprlist are of same type as declared in method methodName
@@ -333,17 +341,19 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
         returnType = method.returnType;
         // First check that number of parameters defined in method is same as inserted in current method call
         // Also don't enter block if there are no parameters to check.
+
         if(method.parameters.size() == ctx.exprList().getChildCount() && method.parameters.size() > 0) {
           // Get all declared parameters from method
           ArrayList<SnappyVariable> declaredParams = new ArrayList<SnappyVariable>(method.parameters.values());
           // get first input type and first declared type
           SnappyType currInputType = ctx.exprList().expr().accept(this);
           SnappyType currDeclType = declaredParams.get(0).type;
-
+          requiredParamTypes.add(currDeclType.type);
+          foundParamTypes.add(currInputType.type);
           // check that they are of the same type
           if(!currInputType.equals(currDeclType)) {
-            //TODO Error, input type does not match declared type
-            ErrorHandler.incompatibleTypes(ctx.exprList().expr().getStart(), currDeclType.type, currInputType.type);
+            // invalid method parameters
+            foundError = true;
           }
           // Get the rest of the input parameters from exprRest
           List<ExprRestContext> inputParams = ctx.exprList().exprRest();
@@ -352,13 +362,21 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
           for(int i = 0; i < inputParams.size(); i++) {
             currInputType = inputParams.get(i).accept(this);
             currDeclType = declaredParams.get(i+1).type;
+            requiredParamTypes.add(currDeclType.type);
+            foundParamTypes.add(currInputType.type);
             if(!currInputType.equals(currDeclType)) {
-              //ERROR
-              ErrorHandler.incompatibleTypes(inputParams.get(i).getStart(), currDeclType.type, currInputType.type);
+              // invalid method parameters
+              foundError = true;
+
+            }
+            if(foundError) {
+              ErrorHandler.invalidMethodParams(ctx.ID().getSymbol(), classType.type,requiredParamTypes.toString(), foundParamTypes.toString());
             }
           }
         } else {
-          //TODO Error, input parameters does not match method declaration
+          if(method.parameters.size() != ctx.exprList().getChildCount()) {
+           ErrorHandler.invalidMethodParamSize(ctx.ID().getSymbol(), classType.type);
+          }
         }
       }
     }
