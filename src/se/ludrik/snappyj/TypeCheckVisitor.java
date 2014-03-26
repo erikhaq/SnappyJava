@@ -40,7 +40,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
+  public SnappyType visitMainClass(@NotNull MainClassContext ctx) {
     String mainId = ctx.ID().get(0).getText();
     currentClass = symbolTable.classes.get(mainId);
     currentMethod = currentClass.methods.get("main");
@@ -57,7 +57,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
+  public SnappyType visitClassDecl(@NotNull ClassDeclContext ctx) {
     String classId = ctx.ID().getText();
     currentClass = symbolTable.classes.get(classId);
 
@@ -74,7 +74,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
+  public SnappyType visitVarDecl(@NotNull VarDeclContext ctx) {
     String varName = ctx.ID().getText();
     SnappyType varType = null;
 
@@ -98,7 +98,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
+  public SnappyType visitMethodDecl(@NotNull MethodDeclContext ctx) {
     String methodId = ctx.ID().getText();
     currentMethod = currentClass.methods.get(methodId);
     SnappyType returnType = currentMethod.returnType;
@@ -131,7 +131,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
+  public SnappyType visitFormalList(@NotNull FormalListContext ctx) {
     if(ctx.getChildCount() > 0) {
       String paramType = ctx.type().getText();
 
@@ -156,7 +156,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return null;
   }
   @Override
-  public SnappyType visitType(@NotNull SnappyJavaParser.TypeContext ctx) {
+  public SnappyType visitType(@NotNull TypeContext ctx) {
     String type = ctx.getText();
     if(!isValidType(type)) {
       //ERROR: No such type
@@ -170,14 +170,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   /*-------------------------------------- Statements ----------------------------------------------*/
 
   @Override
-  public SnappyType visitBody(@NotNull SnappyJavaParser.BodyContext ctx) {
+  public SnappyType visitBody(@NotNull BodyContext ctx) {
     for(StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
     return null;
   }
   @Override
-  public SnappyType visitIf(@NotNull SnappyJavaParser.IfContext ctx) {
+  public SnappyType visitIf(@NotNull IfContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
     if(!exprType.equals(SnappyType.BOOL_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type);
@@ -189,7 +189,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return null;
   }
   @Override
-  public SnappyType visitWhile(@NotNull SnappyJavaParser.WhileContext ctx) {
+  public SnappyType visitWhile(@NotNull WhileContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
     if(!exprType.equals(SnappyType.BOOL_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type);
@@ -198,13 +198,13 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return null;
   }
   @Override
-  public SnappyType visitSout(@NotNull SnappyJavaParser.SoutContext ctx) {
+  public SnappyType visitSout(@NotNull SoutContext ctx) {
     ctx.expr().accept(this);
     return null;
   }
 
   @Override
-  public SnappyType visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
+  public SnappyType visitAssign(@NotNull AssignContext ctx) {
     SnappyVariable left = getVariable(ctx.ID().getText());
     SnappyType rightExp = ctx.expr().accept(this);
 
@@ -218,7 +218,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
+  public SnappyType visitArrayAssign(@NotNull ArrayAssignContext ctx) {
     SnappyVariable id = getVariable(ctx.ID().getText());
     SnappyType innerExp = ctx.expr(0).accept(this);
     SnappyType assingExp = ctx.expr(1).accept(this);
@@ -292,7 +292,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
+  public SnappyType visitArrayExp(@NotNull ArrayExpContext ctx) {
     SnappyType returnType = SnappyType.INT_TYPE;
     // get type of the left expression
     SnappyType leftType = ctx.expr(0).accept(this);
@@ -312,7 +312,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
+  public SnappyType visitLengthExp(@NotNull LengthExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
     if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
       ErrorHandler.notAStatement(ctx.getStart());
@@ -321,7 +321,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
+  public SnappyType visitCallExp(@NotNull CallExpContext ctx) {
     SnappyType returnType = new SnappyType("Not defined");
     SnappyType classType = ctx.expr().accept(this);
     ArrayList<String> requiredParamTypes = new ArrayList<String>();
@@ -387,7 +387,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
+  public SnappyType visitNumExp(@NotNull NumExpContext ctx) {
     try {
       Integer.parseInt(ctx.NUM().getText());
     } catch (NumberFormatException e) {
@@ -399,12 +399,12 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitBoolExp(@NotNull SnappyJavaParser.BoolExpContext ctx) {
+  public SnappyType visitBoolExp(@NotNull BoolExpContext ctx) {
     return SnappyType.BOOL_TYPE;
   }
 
   @Override
-  public SnappyType visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
+  public SnappyType visitIdExp(@NotNull IdExpContext ctx) {
     String varName = ctx.ID().getText();
     SnappyType returnType = new SnappyType(varName);
     SnappyVariable var = getVariable(varName);
@@ -417,7 +417,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override
-  public SnappyType visitThisExp(@NotNull SnappyJavaParser.ThisExpContext ctx) {
+  public SnappyType visitThisExp(@NotNull ThisExpContext ctx) {
     return new SnappyType(currentClass.id);
   }
 
@@ -432,7 +432,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitNewIdExp(@NotNull SnappyJavaParser.NewIdExpContext ctx) {
+  public SnappyType visitNewIdExp(@NotNull NewIdExpContext ctx) {
     String className = ctx.ID().getText();
     SnappyType returnType = new SnappyType(className);
     if(!symbolTable.classes.containsKey(className)) {
@@ -443,7 +443,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitNotExp(@NotNull SnappyJavaParser.NotExpContext ctx) {
+  public SnappyType visitNotExp(@NotNull NotExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
     if(!exprType.equals(SnappyType.BOOL_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type );
@@ -453,12 +453,12 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
 
   @Override
-  public SnappyType visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
+  public SnappyType visitParenExp(@NotNull ParenExpContext ctx) {
     return ctx.expr().accept(this);
   }
   /* ------------------------------------------------ OPERATORS -------------------------------------------- */
   @Override
-  public SnappyType visitOp(@NotNull SnappyJavaParser.OpContext ctx) {
+  public SnappyType visitOp(@NotNull OpContext ctx) {
     SnappyType returnType = null;
     String operator = ctx.getText();
     if(boolOperators.contains(operator)) {
@@ -472,7 +472,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   /* ---------------------------------------- Expression List ----------------------------------------------*/
 
   @Override
-  public SnappyType visitExprRest(@NotNull SnappyJavaParser.ExprRestContext ctx) {
+  public SnappyType visitExprRest(@NotNull ExprRestContext ctx) {
     return ctx.expr().accept(this);
   }
 
