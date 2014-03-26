@@ -33,8 +33,12 @@ public class Main {
     fIn = new FileInputStream(fileName);
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(ErrorHandler.INSTANCE);
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
+    parser.removeErrorListeners();
+    parser.addErrorListener(ErrorHandler.INSTANCE);
     tree = parser.program();
     run();
   }
