@@ -1,7 +1,6 @@
 package se.ludrik.snappyj.objects;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by erikhaq on 2014-03-24.
@@ -9,11 +8,13 @@ import java.util.Map;
 public class SnappyMethod {
   public String id;
   public Map<String, SnappyVariable> parameters;
+
   public Map<String, SnappyVariable> variables;
   public SnappyType returnType;
 
   public SnappyMethod(String methodId) {
-    parameters = new HashMap<String, SnappyVariable>();
+    parameters = new LinkedHashMap<String, SnappyVariable>();
+
     variables = new HashMap<String, SnappyVariable>();
     id = methodId;
   }
@@ -24,6 +25,7 @@ public class SnappyMethod {
 
   public void addParameter(String type, String id) {
     parameters.put(id, new SnappyVariable(id, type));
+
   }
 
   public void addVariable(String type, String id) {

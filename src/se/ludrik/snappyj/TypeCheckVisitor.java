@@ -319,6 +319,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
     if(classType == null) {
       //TODO: ERROR, LEFTHAND NOT DEFINED
+      ErrorHandler.missingClassSymbol(ctx.expr().getStart(), currentMethod.id);
     } else if(symbolTable.classes.containsKey(classType.type)) {
       SnappyClass leftClass = symbolTable.classes.get(classType.type);
       String methodName = ctx.ID().getText();
