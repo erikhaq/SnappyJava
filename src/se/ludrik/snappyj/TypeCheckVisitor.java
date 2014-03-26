@@ -418,6 +418,9 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitThisExp(@NotNull ThisExpContext ctx) {
+    if(currentClass.id.equals(symbolTable.mainClass.id)) {
+      ErrorHandler.cantCallThisFromStaticContext(ctx.getStart());
+    }
     return new SnappyType(currentClass.id);
   }
 
