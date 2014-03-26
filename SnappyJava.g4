@@ -33,7 +33,8 @@ stmt
   ; 
 
 expr
-  : expr LBRACK expr RBRACK               # ArrayExp
+  : LPAREN expr RPAREN                    # ParenExp
+  | expr LBRACK expr RBRACK               # ArrayExp
   | expr '.' ID LPAREN exprList RPAREN    # CallExp
   | expr '.' LENGTH                       # LengthExp
   | '!' expr                              # NotExp
@@ -48,7 +49,6 @@ expr
   | boolLiterals                          # BoolExp
   | ID                                    # IdExp
   | THIS                                  # ThisExp
-  | LPAREN expr RPAREN                    # ParenExp
   ;
 
 op

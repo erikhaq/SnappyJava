@@ -27,7 +27,24 @@ public class ErrorHandler {
     System.err.printf("Error:(%d, %d) java: method %s() is already defined in class %s\n",
         idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText(), className);
   }
+  public static void noSuchMethod(Token methodIdToken, String className) {
+    System.err.printf("Error:(%d, %d) java: no such method %s() defined in class %s\n",
+            methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(), className);
+  }
+  public static void invalidMethodParams(Token methodIdToken, String className, String requiredType, String foundType) {
+    //Error(73, 14)java: method count in class se.ludrik.snappyj.Main.Lek cannot be applied to given types;
+    //required: int
+    //found: boolean
+    System.err.printf(
+            "Error:(%d, %d) java: method %s in class %s cannot be applied to given types\n\trequired:\t%s\n\tfound:\t\t%s\n",
+            methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), requiredType, foundType);
 
+  }
+  public static void invalidMethodParamSize(Token methodIdToken, String className) {
+    System.err.printf(
+            "Error:(%d, %d) java: number of input parameters of method %s in class %s does not match number declared\n",
+            methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(), className);
+  }
   public static void classAlreadyDefined(Token idToken) {
     //Error:(51, 8) java: duplicate class: se.ludrik.snappyj.Main
     System.err.printf("Error:(%d, %d) java: duplicate class: %s\n", idToken.getLine(),
