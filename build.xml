@@ -19,8 +19,21 @@
     <delete dir="${build.dir}"/>
   </target>
 
+  <!-- antlr4 target -->
+  <target name="antlr">
+    <java jar="lib/antlr-4.2-complete.jar" fork="true" failonerror="true">
+      <arg value="-package" />
+      <arg value="se.ludrik.snappyj.antlr" />
+      <arg value="-o" />
+      <arg value="./src/se/ludrik/snappyj/antlr/" />
+      <arg value="-no-listener" />
+      <arg value="-visitor" />
+      <arg value="SnappyJava.g4" />
+    </java>
+  </target>
+
   <!-- compile target -->
-  <target name="compile">
+  <target name="compile" depends="antlr">
     <mkdir dir="${classes.dir}"/>
     <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false">
       <!--<compilerarg value="-Xlint:unchecked" />-->

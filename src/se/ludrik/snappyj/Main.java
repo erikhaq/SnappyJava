@@ -5,18 +5,10 @@ import java.io.IOException;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import se.ludrik.snappyj.objects.*;
+import se.ludrik.snappyj.antlr.*;
 
 /**
  * Main class
- */
-
-/*
-  TODO:
-  TypeChecker:
-    visitMethodDeclaration: check if returnType exists
-    
-
  */
 
 public class Main {
