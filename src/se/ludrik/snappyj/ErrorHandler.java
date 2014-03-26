@@ -2,14 +2,8 @@ package se.ludrik.snappyj;
 
 import mjc.JVMMain;
 import org.antlr.v4.runtime.*;
-import mjc.JVMMain.*;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Nullable;
-
-import java.util.BitSet;
-
 
 /**
  * Created by erikhaq on 2014-03-21.
