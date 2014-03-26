@@ -22,7 +22,9 @@
   <!-- compile target -->
   <target name="compile">
     <mkdir dir="${classes.dir}"/>
-    <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false">
+      <!--<compilerarg value="-Xlint:unchecked" />-->
+    </javac>
   </target>
 
   <!-- jar target -->

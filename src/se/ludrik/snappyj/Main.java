@@ -40,14 +40,32 @@ public class Main {
   }
 
   private void run() {
+    // Building symbol table
+    SymbolTable symTable = buildSymboltable();
+
+    // Typechecking
+    typeCheck(symTable);
+
+  }
+
+  private SymbolTable buildSymboltable() {
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
+    exitIfError();
+    return symTable;
+  }
 
-    System.out.println("------------------------------------------");
-
+  private void typeCheck(SymbolTable symTable) {
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
+    exitIfError();
+  }
+
+  private void exitIfError() {
+    if(ErrorHandler.getErrorDetected()) {
+      System.exit(1);
+    }
   }
 
 }
