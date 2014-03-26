@@ -1,8 +1,6 @@
 package se.ludrik.snappyj;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import se.ludrik.snappyj.objects.*;
 
 /**
@@ -13,9 +11,6 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   private SnappyClass currentClass = null;
   private SnappyMethod currentMethod = null;
 
-  public SymbolTableVisitor() {
-    symbolTable = new SymbolTable();
-  }
   public SymbolTableVisitor(SymbolTable table) {
     symbolTable = table;
 

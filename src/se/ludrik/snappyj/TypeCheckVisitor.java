@@ -3,11 +3,9 @@ package se.ludrik.snappyj;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.objects.*;
 import se.ludrik.snappyj.SnappyJavaParser.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Collection;
 
 public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   SnappyClass currentClass;
