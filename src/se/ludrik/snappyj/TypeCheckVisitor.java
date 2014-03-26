@@ -76,6 +76,8 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
     String varName = ctx.ID().getText();
     SnappyType varType = null;
+
+
     if(currentMethod != null) {
       // declaration is a variable
       varType = currentMethod.variables.get(varName).type;
@@ -367,9 +369,10 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
               foundError = true;
 
             }
-            if(foundError) {
-              ErrorHandler.invalidMethodParams(ctx.ID().getSymbol(), classType.type,requiredParamTypes.toString(), foundParamTypes.toString());
-            }
+          }
+
+          if(foundError) {
+            ErrorHandler.invalidMethodParams(ctx.ID().getSymbol(), classType.type,requiredParamTypes.toString(), foundParamTypes.toString());
           }
         } else {
           if(method.parameters.size() != ctx.exprList().getChildCount()) {
@@ -384,7 +387,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
-    return SnappyType.INT_TYPE;
+    try {
+      Integer.parseInt(ctx.NUM().getText());
+    } catch (NumberFormatException e) {
+      ErrorHandler.notAnumber(ctx.getStart());
+    } finally {
+      return SnappyType.INT_TYPE;
+    }
+
   }
 
   @Override

@@ -52,7 +52,7 @@ public class ErrorHandler {
     //found: boolean
     System.err.printf(
             "Error:(%d, %d) java: method %s in class %s cannot be applied to given types\n\trequired:\t%s\n\tfound:\t\t%s\n",
-            methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), requiredType, foundType);
+            methodIdToken.getLine(), methodIdToken.getCharPositionInLine(), methodIdToken.getText(),className ,requiredType, foundType);
 
   }
   public static void invalidMethodParamSize(Token methodIdToken, String className) {
@@ -66,7 +66,10 @@ public class ErrorHandler {
         idToken.getCharPositionInLine(), idToken.getText());
     setErrorDetected();
   }
-
+  public static void notAnumber(Token idToken) {
+    System.err.printf("Error:(%d, %d) java: %s could not be parsed to int",
+            idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText());
+  }
   public static void incompatibleTypes(Token idToken, String requiredType, String foundType) {
     //Error:(42, 12) java: incompatible types
     //required: boolean
