@@ -8,13 +8,17 @@ import se.ludrik.snappyj.*;
  */
 public class JVMMain {
   public static void main(String[] args) {
+    String fileName;
     if(args.length != 1) {
-      System.err.println("Error: incorrect number of parameters");
-      System.exit(1);
+      System.err.println("No file specified, using default test.java");
+      fileName = "test.java";
+    } else {
+      fileName = args[0];
     }
 
     try {
-      new Main(args[0]);
+      Main snappyJava = new Main();
+      snappyJava.init(fileName);
     } catch (IOException e) {
       e.printStackTrace();
     }

@@ -27,17 +27,7 @@ public class Main {
   private SnappyJavaParser parser;
   private ParseTree tree;
 
-  public Main(String fileName) throws IOException {
-    init(fileName);
-  }
-
-  /*public static void main(String[] args) {
-    try {
-      new Main();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }*/
+  public Main() throws IOException { }
 
   public void init(String fileName) throws IOException {
     fIn = new FileInputStream(fileName);
@@ -46,22 +36,18 @@ public class Main {
     tokens = new CommonTokenStream(lexer);
     parser = new SnappyJavaParser(tokens);
     tree = parser.program();
+    run();
+  }
 
-
+  private void run() {
     SymbolTable symTable = new SymbolTable();
     SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(symTable);
     symbolTableVisitor.visit(tree);
 
     System.out.println("------------------------------------------");
-    //System.out.println(symTable.mainClass);
-    for(SnappyClass c : symTable.classes.values()) {
-      //System.out.println(c);
-    }
+
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
-
-
-
   }
 
 }
