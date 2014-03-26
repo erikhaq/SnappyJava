@@ -23,6 +23,11 @@ public class ErrorHandler extends BaseErrorListener{
     return errorDetected;
   }
 
+  public static void cantCallThisFromStaticContext(Token thisToken) {
+    if(JVMMain.printErrors) System.err.printf("Error:(%d, %d) java: error: non-static variable this cannot be referenced from a static context \n",
+            thisToken.getLine(), thisToken.getCharPositionInLine() );
+    setErrorDetected();
+  }
   public static void variableAlreadyDefinedInMethod(Token idToken, String methodName) {
     //Error:(40, 17) java: variable symTable is already defined in method init()
     if(JVMMain.printErrors) System.err.printf("Error:(%d, %d) java: variable '%s' is already defined in method %s()\n",
@@ -113,7 +118,7 @@ public class ErrorHandler extends BaseErrorListener{
 
   @Override
   public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
-    
+
     if(JVMMain.printErrors) System.err.printf("line %d:%d: %s\n", line, charPositionInLine, msg);
     setErrorDetected();
 
