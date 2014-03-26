@@ -62,7 +62,7 @@ public class ErrorHandler {
 
   public static void missingClassSymbol(Token typeToken, String location) {
     //Error:(43, 5) java: cannot find symbol
-    //symbol:   class Hora
+    //symbol:   class Test
     //location: class se.ludrik.snappyj.Main
     System.err.printf(
         "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tclass %s\n\tlocation:\tclass %s\n",
@@ -71,7 +71,7 @@ public class ErrorHandler {
 
   public static void missingVariableSymbol(Token idToken, String location) {
     //Error:(42, 5) java: cannot find symbol
-    //symbol:   variable bajs
+    //symbol:   variable testVar
     //location: class se.ludrik.snappyj.Main
     System.err.printf(
         "Error:(%d, %d) java: cannot find symbol\n\tsymbol:\t\tvariable %s\n\tlocation:\t%s\n",
