@@ -53,6 +53,22 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     labelcount++;
     return l;
   }
+
+  public SnappyVariable getVariable(String var) {
+    // Try to get var from fields. If it does not exist it will return null
+    SnappyVariable v = currentClass.fields.get(var);
+    if(currentMethod != null) {
+      // check if variable is bound harder for method
+      if(currentMethod.parameters.containsKey(var)) {
+        v = currentMethod.parameters.get(var);
+      } else if(currentMethod.variables.containsKey(var)) {
+        v = currentMethod.variables.get(var);
+      }
+    }
+
+    return v;
+  }
+
   @Override
   public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     String mainId = ctx.ID().get(0).getText();
@@ -241,7 +257,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n");
 
 
-
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     } finally {
@@ -253,7 +268,18 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
-    return super.visitAssign(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    try {
+      /** put right hand side on the stack */
+      ctx.expr().accept(this);
+      /** get store string from left hand side depending on type */
+      SnappyVariable var = getVariable(ctx.ID().getText());
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
   }
 
   @Override

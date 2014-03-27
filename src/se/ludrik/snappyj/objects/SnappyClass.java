@@ -19,6 +19,7 @@ public class SnappyClass {
 
   public void addField(String id, String type) {
     SnappyVariable variable = new SnappyVariable(id, type);
+    variable.isField = true;
     fields.put(variable.id, variable);
   }
 

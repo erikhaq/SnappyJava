@@ -1,6 +1,6 @@
 package se.ludrik.snappyj;
 
-import se.ludrik.snappyj.objects.SnappyType;
+import se.ludrik.snappyj.objects.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -86,6 +86,25 @@ public class JasminUtils {
     sb.append("\n");
 
     return null;
+  }
+
+  public static String getStoreString(SnappyVariable var, String className) {
+    StringBuilder sb = new StringBuilder();
+
+    if(var.isField) {
+      sb.append("aload_0\n");
+      sb.append("getfield ");
+      sb.append(className);
+      sb.append("/");
+      sb.append(var.id);
+      sb.append(" ");
+      sb.append(getJasminType(var.type));
+    }
+    else {
+      
+    }
+
+
   }
 
 
