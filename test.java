@@ -7,7 +7,7 @@ class Factorial2{
       b = new Fac();
       array = b.DoWork(x,3, 3);
       x = 1 + 2 * 4;
-      x = b.hej();
+      //x = b.hej();
 		System.out.println(new Fac().ComputeFac(10));
     }
 }
@@ -33,9 +33,5 @@ class Fac {
 	    num_aux = num * (this.ComputeFac(num-1)) ;
 	return num_aux ;
     }
-
-}
-
-class Fac {
 
 }

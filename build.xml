@@ -33,7 +33,8 @@
   </target>
 
   <!-- compile target -->
-  <target name="compile" depends="antlr">
+  <!--<target name="compile" depends="antlr">-->
+  <target name="compile">
     <mkdir dir="${classes.dir}"/>
     <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false">
       <!--<compilerarg value="-Xlint:unchecked" />-->
