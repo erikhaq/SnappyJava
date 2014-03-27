@@ -18,8 +18,10 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
   }
 
   @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
-    currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
-    currentMethod = currentClass.methods.get("main");
+    try {
+      currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
+      currentMethod = currentClass.methods.get("main");
+    } catch (NullPointerException e) {}
 
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
