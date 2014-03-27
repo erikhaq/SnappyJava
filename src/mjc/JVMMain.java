@@ -31,8 +31,8 @@ public class JVMMain {
     }
 
     try {
-      Main snappyJava = new Main();
-      snappyJava.init(fileName);
+      Main snappyJava = new Main(fileName);
+      snappyJava.init();
     } catch (IOException e) {
       e.printStackTrace();
     }
