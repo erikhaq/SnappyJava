@@ -2,6 +2,7 @@ package se.ludrik.snappyj;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import mjc.JVMMain;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -18,14 +19,14 @@ public class Main {
   private CommonTokenStream tokens;
   private SnappyJavaParser parser;
   private ParseTree tree;
-  private String fileName;
+  private String filePath;
 
-  public Main(String fileName) throws IOException {
-    this.fileName = fileName;
+  public Main(String filePath) throws IOException {
+    this.filePath = filePath;
   }
 
   public void init() throws IOException {
-    fIn = new FileInputStream(fileName);
+    fIn = new FileInputStream(filePath);
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
     lexer.removeErrorListeners();
@@ -46,7 +47,9 @@ public class Main {
     typeCheck(symTable);
 
     // Generate JVM code
-
+    if(JVMMain.generateJvmCode) {
+      generateJVM(symTable);
+    }
 
   }
 
@@ -65,8 +68,9 @@ public class Main {
   }
 
   private void generateJVM(SymbolTable symTable) {
-    CodeGenVisitor codeGenVisitor = new CodeGenVisitor(symTable, fileName);
+    CodeGenVisitor codeGenVisitor = new CodeGenVisitor(symTable, filePath);
     codeGenVisitor.visit(tree);
+    codeGenVisitor.closeWriter();
     exitIfError();
   }
 
