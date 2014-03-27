@@ -10,7 +10,7 @@ public class SnappyMethod {
   public Map<String, SnappyVariable> parameters;
   public Map<String, SnappyVariable> variables;
   public SnappyType returnType;
-  private int LOCAL_NUM = 0;
+  private int LOCAL_NUM = 1;
 
   public SnappyMethod(String methodId) {
     parameters = new LinkedHashMap<String, SnappyVariable>();
