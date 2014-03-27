@@ -8,7 +8,7 @@ import se.ludrik.snappyj.*;
  */
 public class JVMMain {
 
-  public static boolean generateJvmCode = false;
+  public static boolean generateJvmCode = true;
   public static boolean printErrors = true;
 
   public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class JVMMain {
     } else {
       //System.err.println("Please specify a filename");
       System.err.println("Using default file.");
-      filePath = "test.java";
+      filePath = "test-files/test2.java";
       //System.exit(1);
       //return;
     }
