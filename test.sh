@@ -4,8 +4,7 @@
 if [ -z $1 ]
 then
   echo "No arguments supplied."
-  echo "usage: ./test [filename | all] [flags]"
-  echo "optional flags: -n [no java output]"
+  echo "usage: ./test [<filename | <all>] [-n]"
   exit 2
 fi
 
