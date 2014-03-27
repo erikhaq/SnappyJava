@@ -11,8 +11,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 /**
- * Created with IntelliJ IDEA. User: Megatron Date: 2014-03-26 Time: 14:41 To change this template
- * use File | Settings | File Templates.
+ * JVM Code generator class
  */
 public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   BufferedWriter jasminWriter;
