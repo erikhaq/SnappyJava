@@ -4,15 +4,15 @@
 if [ -z $1 ]
 then
   echo "No arguments supplied."
-  echo "usage: ./test [<filename | <all>] [-n]"
+  echo "usage: ./test [<filename | <all>] [-m]"
   exit 2
 fi
 
-JAVA_FLAGS=""
+FLAGS=""
 
-if [ "-n" == "$2" ]
+if [ -n $2 ]
 then
-  JAVA_FLAGS="n"
+  FLAGS+=$2
 fi
 
 if [ "all" == "$1" ]
@@ -24,7 +24,7 @@ then
   for f in $OK_FILES
   do
     echo "Testing file $f"
-    java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain $f "-$JAVA_FLAGS"
+    java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain $f $FLAGS
     STATUS=${?}
     if [ $STATUS -ne 0 ]
     then
@@ -36,7 +36,7 @@ then
   for f in $NOT_SO_OK_FILES
   do
     echo "Testing file $f"
-    java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain $f "-$JAVA_FLAGS"
+    java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain $f $FLAGS
     STATUS=${?}
     if [ $STATUS -ne 1 ]
     then
@@ -48,7 +48,8 @@ else
 
   # Testing single file
   echo "Testing file $1"
-  java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain "$1" "-$JAVA_FLAGS"
+  echo "java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain "$1" $FLAGS"
+  java -cp build/jar/mjc.jar:lib/antlr-4.2-complete.jar mjc.JVMMain "$1" $FLAGS
   echo "Exit status: ${?}"
   
 fi

@@ -5,7 +5,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 
 /**
@@ -15,22 +14,32 @@ import java.io.FileWriter;
 public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   BufferedWriter jasminWriter;
   SymbolTable symbolTable;
-  public String fileName;
-  public CodeGenVisitor(SymbolTable symbolTable, String fileName) {
+  public String filePath;
+  public CodeGenVisitor(SymbolTable symbolTable, String filePath) {
     this.symbolTable = symbolTable;
-    this.fileName = fileName;
+    this.filePath = filePath;
   }
 
-  private void newClass(String className) {
+  public void newClass(String className) {
     try {
       if(jasminWriter != null) {
         jasminWriter.close();
       }
-      jasminWriter = new BufferedWriter(new FileWriter(className));
-      jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;");
-      jasminWriter.write(".source\t" + fileName);
-      jasminWriter.write(".class\t" + className);
-      jasminWriter.write(".super\tjava/lang/Object");
+      jasminWriter = new BufferedWriter(new FileWriter("./" + className + ".s"));
+      jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
+      jasminWriter.write(".source\t" + filePath + "\n");
+      jasminWriter.write(".class\t" + className + "\n");
+      jasminWriter.write(".super\tjava/lang/Object" + "\n\n");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void closeWriter() {
+    try {
+      if(jasminWriter != null) {
+        jasminWriter.close();
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

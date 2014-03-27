@@ -8,30 +8,30 @@ import se.ludrik.snappyj.*;
  */
 public class JVMMain {
 
-  public static boolean generateAssemblyCode = false;
+  public static boolean generateJvmCode = false;
   public static boolean printErrors = true;
 
   public static void main(String[] args) {
-    String fileName;
+    String filePath;
     if(args.length > 0) {
-      fileName = args[0];
+      filePath = args[0];
       if(args.length == 2) {
-        if(args[1].equals("-n")) {
+        if(args[1].equals("-m")) {
           printErrors = false;
         } else if(args[1].equals("-S")) {
-          generateAssemblyCode = true;
+          generateJvmCode = true;
         }
       }
     } else {
       //System.err.println("Please specify a filename");
       System.err.println("Using default file.");
-      fileName = "test.java";
+      filePath = "test.java";
       //System.exit(1);
       //return;
     }
 
     try {
-      Main snappyJava = new Main(fileName);
+      Main snappyJava = new Main(filePath);
       snappyJava.init();
     } catch (IOException e) {
       e.printStackTrace();
