@@ -8,9 +8,9 @@ import java.util.*;
 public class SnappyMethod {
   public String id;
   public Map<String, SnappyVariable> parameters;
-
   public Map<String, SnappyVariable> variables;
   public SnappyType returnType;
+  private int LOCAL_NUM = 0;
 
   public SnappyMethod(String methodId) {
     parameters = new LinkedHashMap<String, SnappyVariable>();
@@ -21,15 +21,24 @@ public class SnappyMethod {
 
   public void addParameter(SnappyVariable param) {
     parameters.put(param.id, param);
+    param.variableNumber = LOCAL_NUM;
+    LOCAL_NUM++;
+
   }
 
   public void addParameter(String type, String id) {
-    parameters.put(id, new SnappyVariable(id, type));
+    SnappyVariable param = new SnappyVariable(id, type);
+    param.variableNumber = LOCAL_NUM;
+    LOCAL_NUM++;
+    parameters.put(id, param);
 
   }
 
   public void addVariable(String type, String id) {
-    variables.put(id, new SnappyVariable(id, type));
+    SnappyVariable var = new SnappyVariable(id, type);
+    var.variableNumber = LOCAL_NUM;
+    LOCAL_NUM++;
+    variables.put(id, var);
   }
 
   public void setReturnType(String returnType) {
