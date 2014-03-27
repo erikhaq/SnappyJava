@@ -79,7 +79,13 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
-    //TODO add constructor to class
+
+    String constructor = JasminUtils.getConstuctorString();
+    try {
+      jasminWriter.write(constructor);
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
 
     /** Declare all methods */
     for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
@@ -97,7 +103,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     if(currentMethod == null) {
       var = currentClass.fields.get(varName);
       /** write the text: .field <identifier><type> */
-      String fieldString = JasminUtils.getFieldString(varName, var.type.toString());
+      String fieldString = JasminUtils.getFieldString(varName, var.type);
       try {
         jasminWriter.write(fieldString);
 
@@ -113,7 +119,19 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
+    currentMethod = currentClass.methods.get(ctx.ID().getText());
+    String methodString = JasminUtils.getOpeningMethodDeclaration(currentMethod.id);
+    try {
+      jasminWriter.write(methodString);
+      //TODO visit formallist so it prints the parameters
+      ctx.formalList().accept(this);
+      jasminWriter.write(JasminUtils.getCloseingMethodDeclaration(currentMethod.returnType));
+      jasminWriter.write(JasminUtils.getMethodLimits(10, currentMethod.LOCAL_NUM));
 
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
     return null;
   }
 
