@@ -71,9 +71,22 @@ public class JasminUtils {
     else if(type.equals(SnappyType.INT_ARRAY_TYPE)) sb.append("[I");
     else if(type.equals(SnappyType.BOOL_TYPE)) sb.append("I");
     else  {
+      sb.append("L");
       sb.append(type.type);
       sb.append(";");
     }
     return sb.toString();
   }
+
+  public static String getReturnString(SnappyType returnType) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("\t");
+    if(returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE))sb.append("ireturn ");
+    else sb.append("areturn ");
+    sb.append("\n");
+
+    return null;
+  }
+
+
 }
