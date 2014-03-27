@@ -3,12 +3,11 @@ package se.ludrik.snappyj;
 import java.io.IOException;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
-import se.ludrik.snappyj.objects.SnappyClass;
-import se.ludrik.snappyj.objects.SnappyMethod;
-import se.ludrik.snappyj.objects.SnappyVariable;
-
+import se.ludrik.snappyj.objects.*;
+import se.ludrik.snappyj.antlr.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+
 
 /**
  * JVM Code generator class
@@ -18,7 +17,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   SymbolTable symbolTable;
   SnappyClass currentClass;
   SnappyMethod currentMethod;
-
+  private int labelcount = 0;
   public String filePath;
   public CodeGenVisitor(SymbolTable symbolTable, String filePath) {
     this.symbolTable = symbolTable;
@@ -49,7 +48,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       e.printStackTrace();
     }
   }
-
+  private String getLabel() {
+    String l = "Label" + labelcount;
+    labelcount++;
+    return l;
+  }
   @Override
   public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     String mainId = ctx.ID().get(0).getText();
@@ -123,27 +126,26 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     String methodString = JasminUtils.getOpeningMethodDeclaration(currentMethod.id);
     try {
       jasminWriter.write(methodString);
-      //TODO visit formallist so it prints the parameters
-      ctx.formalList().accept(this);
+      /** Write all paramters */
+      for(SnappyVariable v : currentMethod.parameters.values()) {
+        jasminWriter.write(JasminUtils.getJasminType(v.type));
+      }
       jasminWriter.write(JasminUtils.getCloseingMethodDeclaration(currentMethod.returnType));
       jasminWriter.write(JasminUtils.getMethodLimits(10, currentMethod.LOCAL_NUM));
+
+      for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+        stmt.accept(this);
+      }
+      /**  Write the return statement */
+      ctx.expr().accept(this);
+      jasminWriter.write(JasminUtils.getReturnString(currentMethod.returnType));
 
 
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }finally {
+      return null;
     }
-    return null;
-  }
-
-  @Override
-  public Object visitFormalList(@NotNull SnappyJavaParser.FormalListContext ctx) {
-    return super.visitFormalList(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public Object visitFormalRest(@NotNull SnappyJavaParser.FormalRestContext ctx) {
-    return super.visitFormalRest(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-
   }
 
   @Override
@@ -156,23 +158,97 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
  @Override
   public Object visitBody(@NotNull SnappyJavaParser.BodyContext ctx) {
-    return super.visitBody(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    for(SnappyJavaParser.StmtContext stmt: ctx.stmt()) {
+      stmt.accept(this);
+    }
+   return null;
   }
 
   @Override
   public Object visitIf(@NotNull SnappyJavaParser.IfContext ctx) {
-    return super.visitIf(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    ctx.expr().accept(this);
+    String doneLabel = getLabel();
+    String elseLabe = getLabel();
+    /** PRINT ifeq <LABEL>> HERE*/
+    try {
+      jasminWriter.write("ifeq " + elseLabe + "\n");
+      ctx.stmt(0).accept(this);
+      jasminWriter.write("goto " + doneLabel + " \n");
+      jasminWriter.write(elseLabe + ":\n");
+
+      /** Visit the else statement*/
+      ctx.stmt(1).accept(this);
+      jasminWriter.write(doneLabel + ":\n");
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
   }
 
   @Override
   public Object visitWhile(@NotNull SnappyJavaParser.WhileContext ctx) {
-    return super.visitWhile(
-        ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    try {
+      /** Print the loopLabel here */
+      String loopLabel = getLabel();
+      String doneLabel = getLabel();
+      jasminWriter.write(loopLabel + ":\n");
+
+      /** visit the while expression*/
+      ctx.expr().accept(this);
+      /** print ifeq doneLabel*/
+      jasminWriter.write("ifeq " + doneLabel + "\n");
+      /** Visit the while statement*/
+      ctx.stmt().accept(this);
+      /** print Goto looplabel */
+      jasminWriter.write("goto " + loopLabel + "\n");
+      /** print doneLabel */
+      jasminWriter.write(doneLabel + ":\n");
+
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
   }
 
   @Override
   public Object visitSout(@NotNull SnappyJavaParser.SoutContext ctx) {
-    return super.visitSout(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      TypeCheckVisitor typechecker = new TypeCheckVisitor(symbolTable);
+      typechecker.currentClass = currentClass;
+      typechecker.currentMethod = currentMethod;
+      SnappyType exprType = ctx.expr().accept(typechecker);
+      /** Get the printstream object*/
+      jasminWriter.write("getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+      /** Put the sout statement on the stack*/
+      ctx.expr().accept(this);
+      /** put the tostring method on the stack*/
+      if(exprType.equals(SnappyType.BOOL_TYPE)){
+        jasminWriter.write("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;\n");
+      } else if(exprType.equals(SnappyType.INT_TYPE)) {
+        jasminWriter.write("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;\n");
+      } else {
+        jasminWriter.write("invokevirtual java/lang/Object/toString()Ljava/lang/String;\n");
+      }
+
+      /** invoke println method on the string on the stack*/
+      jasminWriter.write("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n");
+
+
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
+
   }
 
   @Override
