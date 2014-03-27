@@ -1,45 +1,111 @@
 package se.ludrik.snappyj;
 
+import java.io.IOException;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
+import se.ludrik.snappyj.objects.SnappyClass;
+import se.ludrik.snappyj.objects.SnappyMethod;
+import se.ludrik.snappyj.objects.SnappyVariable;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Megatron
- * Date: 2014-03-26
- * Time: 14:41
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Megatron Date: 2014-03-26 Time: 14:41 To change this template
+ * use File | Settings | File Templates.
  */
 public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   BufferedWriter jasminWriter;
   SymbolTable symbolTable;
-  public CodeGenVisitor(SymbolTable symbolTable, BufferedWriter writer ) {
+  SnappyClass currentClass;
+  SnappyMethod currentMethod;
+  public String fileName;
+  public CodeGenVisitor(SymbolTable symbolTable, String fileName) {
     this.symbolTable = symbolTable;
-    jasminWriter = writer;
+    this.fileName = fileName;
+  }
+
+  private void newClass(String className) {
+    try {
+      if(jasminWriter != null) {
+        jasminWriter.close();
+      }
+      jasminWriter = new BufferedWriter(new FileWriter(className));
+      jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;");
+      jasminWriter.write(".source\t" + fileName);
+      jasminWriter.write(".class\t" + className);
+      jasminWriter.write(".super\tjava/lang/Object");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
   public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
-    return super.visitMainClass(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String mainId = ctx.ID().get(0).getText();
+    currentClass = symbolTable.classes.get(mainId);
+    currentMethod = currentClass.methods.get("main");
+    newClass(mainId);
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+      stmt.accept(this);
+    }
+
+    currentMethod = null;
+    currentClass = null;
+
+    return null;
   }
 
   @Override
   public Object visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
-    return super.visitClassDecl(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String classId = ctx.ID().getText();
+    currentClass = symbolTable.classes.get(classId);
+    newClass(classId);
+
+    // visit the fields
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+      v.accept(this);
+    }
+    //TODO add constructor to class
+
+    /** Declare all methods */
+    for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
+      m.accept(this);
+    }
+    currentClass = null;
+
+    return null;
   }
 
   @Override
   public Object visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
-    return super.visitVarDecl(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    String varName = ctx.ID().getText();
+    SnappyVariable var;
+    if(currentMethod == null) {
+      var = currentClass.fields.get(varName);
+      /** write the text: .field <identifier><type> */
+      String fieldString = JasminUtils.getFieldString(varName, var.type.toString());
+      try {
+        jasminWriter.write(fieldString);
+
+      } catch (IOException e) {
+        System.err.println("could not write to file\n");
+      }
+
+    }
+
+
+    return null;
   }
 
   @Override
   public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
-    return super.visitMethodDecl(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    return null;
   }
 
   @Override
@@ -50,13 +116,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitFormalRest(@NotNull SnappyJavaParser.FormalRestContext ctx) {
     return super.visitFormalRest(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
   }
 
   @Override
   public Object visitType(@NotNull SnappyJavaParser.TypeContext ctx) {
-    return super.visitType(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return super.visitType(
+        ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
-
 
  /** ---------------------------------- Statements -------------------------------------------------------------- */
 
@@ -72,7 +139,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitWhile(@NotNull SnappyJavaParser.WhileContext ctx) {
-    return super.visitWhile(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return super.visitWhile(
+        ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override
@@ -95,7 +163,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
-    return super.visitParenExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return super.visitParenExp(
+        ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override
@@ -134,7 +203,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   }
   @Override
   public Object visitAddSubOp(@NotNull SnappyJavaParser.AddSubOpContext ctx) {
-    return super.visitAddSubOp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return super.visitAddSubOp(
+        ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override
@@ -167,7 +237,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
-    return super.visitIdExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    return super.visitIdExp(
+        ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
   @Override

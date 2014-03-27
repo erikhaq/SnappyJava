@@ -18,10 +18,13 @@ public class Main {
   private CommonTokenStream tokens;
   private SnappyJavaParser parser;
   private ParseTree tree;
+  private String fileName;
 
-  public Main() throws IOException { }
+  public Main(String fileName) throws IOException {
+    this.fileName = fileName;
+  }
 
-  public void init(String fileName) throws IOException {
+  public void init() throws IOException {
     fIn = new FileInputStream(fileName);
     input = new ANTLRInputStream(fIn);
     lexer = new SnappyJavaLexer(input);
@@ -42,6 +45,9 @@ public class Main {
     // Typechecking
     typeCheck(symTable);
 
+    // Generate JVM code
+
+
   }
 
   private SymbolTable buildSymboltable() {
@@ -55,6 +61,12 @@ public class Main {
   private void typeCheck(SymbolTable symTable) {
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
+    exitIfError();
+  }
+
+  private void generateJVM(SymbolTable symTable) {
+    CodeGenVisitor codeGenVisitor = new CodeGenVisitor(symTable, fileName);
+    codeGenVisitor.visit(tree);
     exitIfError();
   }
 
