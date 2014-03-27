@@ -65,6 +65,13 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
+    System.out.println("current method: " + currentMethod.id);
+    for(SnappyVariable v : currentMethod.parameters.values()) {
+      System.out.println("param local number: " + v.variableNumber);
+    }
+    for(SnappyVariable v : currentMethod.variables.values()) {
+      System.out.println("var local number: " + v.variableNumber);
+    }
     currentMethod = null;
     return null;
 
