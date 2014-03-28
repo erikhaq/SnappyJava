@@ -26,10 +26,16 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     SnappyVariable var = getVariable(varName);
 
     try {
-      jasminWriter.write("\taload " + var.variableNumber + "\n");
       if (var.isField) {
         /** load field variable onto stack */
+        jasminWriter.write("\taload_0\n");
         jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
+      } else {
+        if(var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) {
+          jasminWriter.write("\tiload " + var.variableNumber + "\n");
+        } else {
+          jasminWriter.write("\taload " + var.variableNumber + "\n");
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
