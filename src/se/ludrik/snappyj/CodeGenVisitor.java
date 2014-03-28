@@ -22,6 +22,20 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     this.filePath = filePath;
   }
 
+  public void pushVariableToStack(String varName) {
+    SnappyVariable var = getVariable(varName);
+
+    try {
+      jasminWriter.write("\taload " + var.variableNumber + "\n");
+      if (var.isField) {
+        /** load field variable onto stack */
+        jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
+      }
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+
+  }
   public void newClass(String className) {
     try {
       if(jasminWriter != null) {
@@ -299,13 +313,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
     /** write load instruction for array*/
+
     SnappyVariable var = getVariable(ctx.ID().getText());
     try {
-      jasminWriter.write("\taload " + var.variableNumber + "\n");
-      if (var.isField) {
-        /** load field variable onto stack */
-        jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
-      }
+      /** push the left hand side variable onto the stack */
+      pushVariableToStack(ctx.ID().getText());
       /** load index onto stack */
       ctx.expr(0).accept(this);
       /** load right hand side onto stack */
@@ -389,18 +401,44 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitNotExp(@NotNull SnappyJavaParser.NotExpContext ctx) {
+    try {
+      jasminWriter.write("\ticonst_1\n"); // write 1 on the stack
+      ctx.expr().accept(this);            // write boolean 1 or 0 on stack
+      jasminWriter.write("\tisub\n");     // subtract 0 or 1 from 1 and push on stack
 
-    return null;
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
   }
 
   @Override
   public Object visitNewIntArrayExp(@NotNull SnappyJavaParser.NewIntArrayExpContext ctx) {
-    return super.visitNewIntArrayExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      ctx.expr().accept(this);
+      jasminWriter.write("\tnewarray int\n");
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
   }
 
   @Override
   public Object visitNewIdExp(@NotNull SnappyJavaParser.NewIdExpContext ctx) {
-    return super.visitNewIdExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      String className = ctx.ID().getText();
+      jasminWriter.write("\tnew " + className + "\n"); // create a new object reference
+      jasminWriter.write("\tdup\n");                            // duplicate so we can invoke the constructor
+      jasminWriter.write("\tinvokespecial " + className + "/<init>()V\n");
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
   }
 
   @Override
@@ -464,13 +502,22 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
-    return super.visitIdExp(
-        ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+      pushVariableToStack(ctx.ID().getText());
+      return null;
   }
 
   @Override
   public Object visitThisExp(@NotNull SnappyJavaParser.ThisExpContext ctx) {
-    return super.visitThisExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      jasminWriter.write("\taload_0\n");
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
+
   }
  /** --------------------------------------------------------- ExprList-----------------------------------------------*/
   @Override

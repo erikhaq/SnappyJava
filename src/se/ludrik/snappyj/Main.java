@@ -72,6 +72,7 @@ public class Main {
     codeGenVisitor.visit(tree);
     codeGenVisitor.closeWriter();
     exitIfError();
+
   }
 
   private void exitIfError() {
