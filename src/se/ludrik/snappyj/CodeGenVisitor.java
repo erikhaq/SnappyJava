@@ -87,7 +87,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     //Declare main method
     try {
       jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
-      jasminWriter.write("\t.limit stack 32\n"); //TODO fix this
+      jasminWriter.write(JasminUtils.getMethodLimits(32, currentMethod.LOCAL_NUM));
 
       for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
         v.accept(this);
@@ -96,7 +96,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         stmt.accept(this);
       }
 
-      jasminWriter.write("return\n.end method\n");
+      jasminWriter.write("\treturn\n.end method\n");
       currentMethod = null;
       currentClass = null;
 
@@ -463,20 +463,26 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     return null;
   }
 
-  @Override
-  public Object visitLTComp(@NotNull SnappyJavaParser.LTCompContext ctx) {
+  public void visitComp(String comparator) {
     try {
-      visitChildren(ctx);
-      jasminWriter.write(JasminUtils.getComparatorString(ctx.getChild(0).getText()));
+      jasminWriter.write(JasminUtils.getComparatorString(comparator));
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public Object visitLTComp(@NotNull SnappyJavaParser.LTCompContext ctx) {
+    visitChildren(ctx);
+    visitComp(ctx.getChild(1).getText());
     return null;
   }
 
   @Override
   public Object visitGTComp(@NotNull SnappyJavaParser.GTCompContext ctx) {
-    return super.visitGTComp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    visitChildren(ctx);
+    visitComp(ctx.getChild(1).getText());
+    return null;
   }
 
   @Override
