@@ -90,22 +90,58 @@ public class JasminUtils {
 
   public static String getStoreString(SnappyVariable var, String className) {
     StringBuilder sb = new StringBuilder();
-
     if(var.isField) {
-      sb.append("aload_0\n");
-      sb.append("getfield ");
-      sb.append(className);
-      sb.append("/");
-      sb.append(var.id);
-      sb.append(" ");
-      sb.append(getJasminType(var.type));
+      /** return the string putfield Classname/fieldname fieldType */
+      sb.append(getPutfieldString(var, className));
     }
     else {
-      
+      sb.append("\t");
+      /** if type is int or bool do an istore else we store an object reference*/
+      if(var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) sb.append("istore ");
+      else sb.append("astore ");
+      sb.append(var.variableNumber);
+      sb.append("\n");
     }
-
-
+    return sb.toString();
   }
+
+  public static String getLoadString(SnappyVariable var, String className) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("\t");
+
+    return sb.toString();
+  }
+
+  public static String getGetfieldString(SnappyVariable var, String classname) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("\t");
+    /**create the string getfield <classname>/<fieldname> <fieldtype>*/
+    sb.append("getfield ");
+    sb.append(classname);
+    sb.append("/");
+    sb.append(var.id);
+    sb.append(" ");
+    sb.append(getJasminType(var.type));
+    sb.append("\n");
+
+    return sb.toString();
+  }
+
+  public static String getPutfieldString(SnappyVariable var, String className) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("\t");
+
+    /** return the string putfield <className>/<fieldname> <fieldType> */
+    sb.append("putfield ");
+    sb.append(className);
+    sb.append("/");
+    sb.append(var.id);
+    sb.append(" ");
+    sb.append(getJasminType(var.type));
+
+    return sb.toString();
+  }
+
 
 
 }
