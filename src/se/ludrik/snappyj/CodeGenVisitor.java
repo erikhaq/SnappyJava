@@ -281,8 +281,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   public Object visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
 
 
-      /** get the left hand side variable*/
-      SnappyVariable var = getVariable(ctx.ID().getText());
+    /** get the left hand side variable*/
+    SnappyVariable var = getVariable(ctx.ID().getText());
     try {
       if(var.isField) {
         /** load 'this' onto the stack*/
@@ -337,10 +337,16 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   public Object visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
     SnappyVariable var = getVariable(ctx.expr(0).getText());
     try {
+      /** put array reference on stack */
+      jasminWriter.write("\taload " + var.variableNumber + "\n");
       if(var.isField) {
-        jasminWriter.write("\taload 0");
-
+        /** put field reference on stack */
+        jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
       }
+      /** put index value on stack */
+      ctx.expr(1).accept(this);
+      /** load value from array */
+      jasminWriter.write("\tiaload\n");
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     } finally {
@@ -350,17 +356,46 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
-    return super.visitCallExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symbolTable);
+    typeCheckVisitor.currentClass = currentClass;
+    typeCheckVisitor.currentMethod = currentMethod;
+    SnappyType leftType = ctx.expr().accept(typeCheckVisitor);
+    try {
+      /** push left hand expression on the stack(the caller object) */
+      ctx.expr().accept(this);
+      /** push method arguments on the stack */
+      ctx.exprList().accept(this);
+      /** get the method that this epression wants to call */
+      SnappyMethod m = symbolTable.classes.get(leftType.type).methods.get(ctx.ID().getText());
+      jasminWriter.write(JasminUtils.getInvokevirtualString(m, leftType.type));
+
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
   }
 
   @Override
   public Object visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
-    return super.visitLengthExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+
+    try {
+      /** put the array reference on the stack */
+      ctx.expr().accept(this);
+      jasminWriter.write("\tarraylength\n");
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
   }
 
   @Override
   public Object visitNotExp(@NotNull SnappyJavaParser.NotExpContext ctx) {
-    return super.visitNotExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    return null;
   }
 
   @Override
