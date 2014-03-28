@@ -44,7 +44,7 @@ public class JasminUtils {
 
     return sb.toString();
   }
-  public static String getCloseingMethodDeclaration(SnappyType returnType) {
+  public static String getClosingMethodDeclaration(SnappyType returnType) {
     StringBuilder sb = new StringBuilder();
     sb.append(")");
     sb.append(getJasminType(returnType));
@@ -104,7 +104,20 @@ public class JasminUtils {
       
     }
 
+    return null;
+  }
 
+  public static String getLoadIntString(String intLit) {
+    //TODO check if int can be loaded with more optimized method than ldc
+    StringBuilder sb = new StringBuilder();
+    sb.append("ldc ");
+    sb.append(Integer.parseInt(intLit));
+    sb.append("\n");
+    return sb.toString();
+  }
+
+  public static String getAddSubString(String operator) {
+    return operator.equals("+") ? "iadd\n" : "isub\n";
   }
 
 
