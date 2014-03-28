@@ -16,7 +16,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   SymbolTable symbolTable;
   SnappyClass currentClass;
   SnappyMethod currentMethod;
-  private int labelcount = 0;
   public String filePath;
   public CodeGenVisitor(SymbolTable symbolTable, String filePath) {
     this.symbolTable = symbolTable;
@@ -47,11 +46,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       e.printStackTrace();
     }
   }
-  private String getLabel() {
-    String l = "Label" + labelcount;
-    labelcount++;
-    return l;
-  }
+
 
   public SnappyVariable getVariable(String var) {
     // Try to get var from fields. If it does not exist it will return null
@@ -78,7 +73,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     //Declare main method
     try {
       jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
-      jasminWriter.write(".limit stack 32\n"); //TODO fix this
+      jasminWriter.write("\t.limit stack 32\n"); //TODO fix this
 
       for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
         v.accept(this);
@@ -194,8 +189,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitIf(@NotNull SnappyJavaParser.IfContext ctx) {
     ctx.expr().accept(this);
-    String doneLabel = getLabel();
-    String elseLabe = getLabel();
+    String doneLabel = JasminUtils.getLabel();
+    String elseLabe = JasminUtils.getLabel();
     /** PRINT ifeq <LABEL>> HERE*/
     try {
       jasminWriter.write("ifeq " + elseLabe + "\n");
@@ -220,8 +215,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
     try {
       /** Print the loopLabel here */
-      String loopLabel = getLabel();
-      String doneLabel = getLabel();
+      String loopLabel = JasminUtils.getLabel();
+      String doneLabel = JasminUtils.getLabel();
       jasminWriter.write(loopLabel + ":\n");
 
       /** visit the while expression*/
@@ -252,20 +247,20 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       typechecker.currentMethod = currentMethod;
       SnappyType exprType = ctx.expr().accept(typechecker);
       /** Get the printstream object*/
-      jasminWriter.write("getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+      jasminWriter.write("\tgetstatic java/lang/System/out Ljava/io/PrintStream;\n");
       /** Put the sout statement on the stack*/
       ctx.expr().accept(this);
       /** put the tostring method on the stack*/
       if(exprType.equals(SnappyType.BOOL_TYPE)){
-        jasminWriter.write("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;\n");
+        jasminWriter.write("\tinvokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;\n");
       } else if(exprType.equals(SnappyType.INT_TYPE)) {
-        jasminWriter.write("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;\n");
+        jasminWriter.write("\tinvokestatic java/lang/Integer/toString(I)Ljava/lang/String;\n");
       } else {
-        jasminWriter.write("invokevirtual java/lang/Object/toString()Ljava/lang/String;\n");
+        jasminWriter.write("\tinvokevirtual java/lang/Object/toString()Ljava/lang/String;\n");
       }
 
       /** invoke println method on the string on the stack*/
-      jasminWriter.write("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n");
+      jasminWriter.write("\tinvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n");
 
 
     } catch (IOException e) {
@@ -375,7 +370,13 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitMultiOp(@NotNull SnappyJavaParser.MultiOpContext ctx) {
-    return super.visitMultiOp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      visitChildren(ctx);
+      jasminWriter.write("\timul\n");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
   @Override
   public Object visitAddSubOp(@NotNull SnappyJavaParser.AddSubOpContext ctx) {
@@ -391,7 +392,13 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitLTComp(@NotNull SnappyJavaParser.LTCompContext ctx) {
-    return super.visitLTComp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      visitChildren(ctx);
+      jasminWriter.write(JasminUtils.getComparatorString(ctx.getChild(0).getText()));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
