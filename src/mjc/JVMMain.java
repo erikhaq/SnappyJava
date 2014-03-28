@@ -8,7 +8,7 @@ import se.ludrik.snappyj.*;
  */
 public class JVMMain {
 
-  public static boolean generateJvmCode = true;
+  public static boolean generateJvmCode = false;
   public static boolean printErrors = true;
 
   public static void main(String[] args) {
