@@ -155,6 +155,24 @@ public class JasminUtils {
     return sb.toString();
   }
 
+  public static String getInvokevirtualString(SnappyMethod method, String className) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("\t");
+    sb.append("invokevirtual ");
+    sb.append(className);
+    sb.append("/");
+    sb.append(method.id);
+    sb.append("(");
+    for(SnappyVariable param : method.parameters.values()) {
+      sb.append(getJasminType(param.type));
+    }
+    sb.append(")");
+    sb.append(getJasminType(method.returnType));
+    sb.append("\n");
+
+    return sb.toString();
+  }
+
 
 
 }
