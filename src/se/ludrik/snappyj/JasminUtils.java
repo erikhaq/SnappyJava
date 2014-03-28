@@ -11,6 +11,14 @@ import se.ludrik.snappyj.objects.*;
  */
 public class JasminUtils {
 
+  public static int labelcount = 0;
+
+  public static String getLabel() {
+    String l = "Label" + JasminUtils.labelcount;
+    JasminUtils.labelcount++;
+    return l;
+  }
+
 
   public static String getFieldString(String id, SnappyType type) {
     /** */
@@ -108,14 +116,14 @@ public class JasminUtils {
   public static String getLoadIntString(String intLit) {
     //TODO check if int can be loaded with more optimized method than ldc
     StringBuilder sb = new StringBuilder();
-    sb.append("ldc ");
+    sb.append("\tldc ");
     sb.append(Integer.parseInt(intLit));
     sb.append("\n");
     return sb.toString();
   }
 
   public static String getAddSubString(String operator) {
-    return operator.equals("+") ? "iadd\n" : "isub\n";
+    return operator.equals("+") ? "\tiadd\n" : "\tisub\n";
   }
 
   public static String getLoadString(SnappyVariable var, String className) {
@@ -155,6 +163,7 @@ public class JasminUtils {
     return sb.toString();
   }
 
+
   public static String getInvokevirtualString(SnappyMethod method, String className) {
     StringBuilder sb = new StringBuilder();
     sb.append("\t");
@@ -174,5 +183,30 @@ public class JasminUtils {
   }
 
 
+  public static String getComparatorString(String comparator) {
+    String label1 = getLabel(), label2 = getLabel();
+    StringBuilder sb = new StringBuilder();
+    if(comparator.equals("<")) {
+      sb.append("\tif_icmplt ");
+    } else if(comparator.equals("<=")) {
+      sb.append("\tif_icmple ");
+    } else if(comparator.equals(">")) {
+      sb.append("\tif_icmpgt ");
+    } else { //comparator.equals(">=")
+      sb.append("\tif_icmpge ");
+    }
+    sb.append(label2);
+    sb.append("\n");
+    sb.append("\ticonst_0\n");
+    sb.append("\tgoto ");
+    sb.append(label1);
+    sb.append("\n\t");
+    sb.append(label2);
+    sb.append(":\n");
+    sb.append("\ticonst_1\n\t");
+    sb.append(label1);
+    sb.append(":\n");
+    return sb.toString();
+  }
 
 }
