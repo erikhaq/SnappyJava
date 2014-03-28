@@ -280,22 +280,48 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
 
+
+      /** get the left hand side variable*/
+      SnappyVariable var = getVariable(ctx.ID().getText());
     try {
+      if(var.isField) {
+        /** load 'this' onto the stack*/
+        jasminWriter.write("\taload 0");
+      }
       /** put right hand side on the stack */
       ctx.expr().accept(this);
       /** get store string from left hand side depending on type */
-      SnappyVariable var = getVariable(ctx.ID().getText());
 
-    } /*catch (IOException e) {
+      jasminWriter.write(JasminUtils.getStoreString(var, currentClass.id));
+    } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    } */finally {
+    } finally {
       return null;
     }
+
   }
 
   @Override
   public Object visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
-    return super.visitArrayAssign(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    /** write load instruction for array*/
+    SnappyVariable var = getVariable(ctx.ID().getText());
+    try {
+      jasminWriter.write("\taload " + var.variableNumber + "\n");
+      if (var.isField) {
+        /** load field variable onto stack */
+        jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
+      }
+      /** load index onto stack */
+      ctx.expr(0).accept(this);
+      /** load right hand side onto stack */
+      ctx.expr(1).accept(this);
+      /** store into loaded array */
+      jasminWriter.write("\tiastore \n");
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }finally {
+      return null;
+    }
   }
 
   /**------------------------------------------ Expressions ---------------------------------------------------*/
@@ -303,13 +329,23 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
-    return super.visitParenExp(
-        ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    ctx.expr().accept(this);
+    return null;
   }
 
   @Override
   public Object visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
-    return super.visitArrayExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    SnappyVariable var = getVariable(ctx.expr(0).getText());
+    try {
+      if(var.isField) {
+        jasminWriter.write("\taload 0");
+
+      }
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
   }
 
   @Override

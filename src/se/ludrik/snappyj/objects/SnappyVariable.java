@@ -6,7 +6,7 @@ package se.ludrik.snappyj.objects;
 public class SnappyVariable {
   public SnappyType type;
   public String id;
-  public int variableNumber;
+  public int variableNumber = 0;
   public boolean isField = false;
   public SnappyVariable(String variableId, String type) {
     id = variableId;
