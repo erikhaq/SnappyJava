@@ -509,7 +509,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitBoolExp(@NotNull SnappyJavaParser.BoolExpContext ctx) {
-    return super.visitBoolExp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+
+    ctx.boolLiterals().accept(this);
+    return null;
   }
 
   @Override
@@ -531,19 +533,21 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
 
   }
- /** --------------------------------------------------------- ExprList-----------------------------------------------*/
-  @Override
-  public Object visitExprList(@NotNull SnappyJavaParser.ExprListContext ctx) {
-    return super.visitExprList(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public Object visitExprRest(@NotNull SnappyJavaParser.ExprRestContext ctx) {
-    return super.visitExprRest(ctx);    //To change body of overridden methods use File | Settings | File Templates.
-  }
+ /** --------------------------------------------------------- boolliterals-----------------------------------------------*/
 
   @Override
   public Object visitBoolLiterals(@NotNull SnappyJavaParser.BoolLiteralsContext ctx) {
-    return super.visitBoolLiterals(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      if(ctx.TRUE() != null) {
+        jasminWriter.write("\ticonst_1");
+      } else {
+        jasminWriter.write("\ticonst_0");
+      }
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    } finally {
+      return null;
+    }
+
   }
 }
