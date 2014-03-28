@@ -474,6 +474,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write(JasminUtils.getComparatorString(comparator));
     } catch (IOException e) {
       e.printStackTrace();
+      
     }
   }
 
