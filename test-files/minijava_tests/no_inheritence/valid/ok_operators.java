@@ -4,7 +4,10 @@ class Main
 {
     public static void main(String[] s) 
     {
-	System.out.println(1);
+    A a;
+    a = new A();
+    System.out.println(a.f(1,2,true,false));
+
     }
 }
 
