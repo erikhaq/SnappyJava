@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
 import se.ludrik.snappyj.objects.*;
-import se.ludrik.snappyj.antlr.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
@@ -75,15 +74,27 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     currentClass = symbolTable.classes.get(mainId);
     currentMethod = currentClass.methods.get("main");
     newClass(mainId);
-    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
-      v.accept(this);
-    }
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
-      stmt.accept(this);
+
+    //Declare main method
+    try {
+      jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
+      jasminWriter.write(".limit stack 32\n"); //TODO fix this
+
+      for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+        v.accept(this);
+      }
+      for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+        stmt.accept(this);
+      }
+
+      jasminWriter.write("return\n.end method\n");
+      currentMethod = null;
+      currentClass = null;
+
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
-    currentMethod = null;
-    currentClass = null;
 
     return null;
   }
@@ -146,7 +157,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       for(SnappyVariable v : currentMethod.parameters.values()) {
         jasminWriter.write(JasminUtils.getJasminType(v.type));
       }
-      jasminWriter.write(JasminUtils.getCloseingMethodDeclaration(currentMethod.returnType));
+      jasminWriter.write(JasminUtils.getClosingMethodDeclaration(currentMethod.returnType));
       jasminWriter.write(JasminUtils.getMethodLimits(10, currentMethod.LOCAL_NUM));
 
       for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
@@ -275,9 +286,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** get store string from left hand side depending on type */
       SnappyVariable var = getVariable(ctx.ID().getText());
 
-    } catch (IOException e) {
+    } /*catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    } finally {
+    } */finally {
       return null;
     }
   }
@@ -332,8 +343,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   }
   @Override
   public Object visitAddSubOp(@NotNull SnappyJavaParser.AddSubOpContext ctx) {
-    return super.visitAddSubOp(
-        ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      visitChildren(ctx);
+      String operator = ctx.getChild(1).getText(); //maybe not best way to check +/-?
+      jasminWriter.write(JasminUtils.getAddSubString(operator));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
@@ -354,8 +371,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
     String intLit = ctx.NUM().getText();
-    int i = Integer.parseInt(intLit);
-    
+    try {
+      jasminWriter.write(JasminUtils.getLoadIntString(intLit));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     return null;
   }
 
