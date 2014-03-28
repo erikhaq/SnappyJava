@@ -92,8 +92,7 @@ public class JasminUtils {
     if(returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE))sb.append("ireturn ");
     else sb.append("areturn ");
     sb.append("\n");
-
-    return null;
+    return sb.toString();
   }
 
   public static String getStoreString(SnappyVariable var, String className) {

@@ -47,7 +47,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       if(jasminWriter != null) {
         jasminWriter.close();
       }
-      jasminWriter = new BufferedWriter(new FileWriter("./" + className + ".s"));
+      jasminWriter = new BufferedWriter(new FileWriter("./jasmin/" + className + ".s"));
       jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
       jasminWriter.write(".class\t" + className + "\n");
@@ -173,7 +173,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         jasminWriter.write(JasminUtils.getJasminType(v.type));
       }
       jasminWriter.write(JasminUtils.getClosingMethodDeclaration(currentMethod.returnType));
-      jasminWriter.write(JasminUtils.getMethodLimits(10, currentMethod.LOCAL_NUM));
+      jasminWriter.write(JasminUtils.getMethodLimits(32, currentMethod.LOCAL_NUM)); //TODO: real stack size calc
 
       for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
@@ -181,7 +181,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /**  Write the return statement */
       ctx.expr().accept(this);
       jasminWriter.write(JasminUtils.getReturnString(currentMethod.returnType));
-
+      jasminWriter.write(".end method\n");
 
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
