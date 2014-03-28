@@ -474,7 +474,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write(JasminUtils.getComparatorString(comparator));
     } catch (IOException e) {
       e.printStackTrace();
-      
     }
   }
 
@@ -494,7 +493,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitAndComp(@NotNull SnappyJavaParser.AndCompContext ctx) {
-    return super.visitAndComp(ctx);    //To change body of overridden methods use File | Settings | File Templates.
+    try {
+      visitChildren(ctx);
+      jasminWriter.write("\tiand\n");
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      return null;
+    }
   }
 
   @Override
@@ -540,9 +546,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   public Object visitBoolLiterals(@NotNull SnappyJavaParser.BoolLiteralsContext ctx) {
     try {
       if(ctx.TRUE() != null) {
-        jasminWriter.write("\ticonst_1");
+        jasminWriter.write("\ticonst_1\n");
       } else {
-        jasminWriter.write("\ticonst_0");
+        jasminWriter.write("\ticonst_0\n");
       }
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
