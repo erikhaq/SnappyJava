@@ -226,15 +226,16 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else if(!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
       // the left hand side identifier is not of type INT_ARRAY!
+      System.out.println("BOEg");
       ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), SnappyType.INT_ARRAY_TYPE.type, id.type.toString());
     }
     // check that inner expression is of type INT_TYPE
     if(!innerExp.equals(SnappyType.INT_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_TYPE.type, innerExp.type);
     }
-    // check that the right hand side is of type INT_ARRAY
-    if(!assingExp.equals(SnappyType.INT_ARRAY_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_ARRAY_TYPE.type, assingExp.type);
+    // check that the right hand side is of type INT_TYPE
+    if(!assingExp.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type, assingExp.type);
     }
     return null;
   }

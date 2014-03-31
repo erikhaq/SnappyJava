@@ -11,6 +11,7 @@ public class SnappyMethod {
   public Map<String, SnappyVariable> variables;
   public SnappyType returnType;
   public int LOCAL_NUM = 1;
+  private int stackSize = 1;
 
   public SnappyMethod(String methodId) {
     parameters = new LinkedHashMap<String, SnappyVariable>();
@@ -64,4 +65,11 @@ public class SnappyMethod {
     return sb.toString();
   }
 
+  public int getStackSize() {
+    return stackSize;
+  }
+
+  public void setStackSize(int stackSize) {
+    this.stackSize = stackSize;
+  }
 }
