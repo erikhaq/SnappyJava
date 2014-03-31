@@ -5,7 +5,14 @@ class Main
 {
     public static void main(String[] s) 
     {
-	System.out.println(1);
+        A a;
+        boolean b;
+        a = new A();
+        System.out.println(1337);
+        b = a.f(30, true);
+
+	   System.out.println(b);
+
     }
 }
 

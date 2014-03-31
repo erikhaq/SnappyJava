@@ -158,6 +158,7 @@ public class JasminUtils {
     sb.append(var.id);
     sb.append(" ");
     sb.append(getJasminType(var.type));
+    sb.append("\n");
 
     return sb.toString();
   }
