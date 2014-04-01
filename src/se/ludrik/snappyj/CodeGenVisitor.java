@@ -56,7 +56,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
       File f = new File(filePath);
       String fileName = f.getName();
-      System.out.println(fileName);
       String[] s = fileName.split("\\.");
       sb.append(s[0]);
       f = new File(sb.toString());
@@ -64,7 +63,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       sb.append("/");
       sb.append(className);
       sb.append(".s");
-      //jasminWriter = new BufferedWriter(new FileWriter("./jasmin/" + className + ".s"));
+      //jasminWriter = new BufferxedWriter(new FileWriter("./jasmin/" + className + ".s"));
       jasminWriter = new BufferedWriter(new FileWriter(sb.toString()));
       jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
@@ -111,7 +110,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     //Declare main method
     try {
       jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
-      jasminWriter.write(JasminUtils.getMethodLimits(32, currentMethod.LOCAL_NUM));
+      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM));
 
       for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
         v.accept(this);
@@ -120,7 +119,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         stmt.accept(this);
       }
 
-      jasminWriter.write("\treturn\n.end method\n");
+      jasminWriter.write("\treturn\n.end method\n\n");
       currentMethod = null;
       currentClass = null;
 
@@ -191,7 +190,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         jasminWriter.write(JasminUtils.getJasminType(v.type));
       }
       jasminWriter.write(JasminUtils.getClosingMethodDeclaration(currentMethod.returnType));
-      jasminWriter.write(JasminUtils.getMethodLimits(32, currentMethod.LOCAL_NUM)); //TODO: real stack size calc
+      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM)); //TODO: real stack size calc
 
       for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
@@ -199,7 +198,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /**  Write the return statement */
       ctx.expr().accept(this);
       jasminWriter.write(JasminUtils.getReturnString(currentMethod.returnType));
-      jasminWriter.write(".end method\n");
+      jasminWriter.write(".end method\n\n");
 
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -227,7 +226,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitIf(@NotNull SnappyJavaParser.IfContext ctx) {
     ctx.expr().accept(this);
-    System.out.println("If expr: " + ctx.expr().getText());
     String doneLabel = JasminUtils.getLabel();
     String elseLabe = JasminUtils.getLabel();
     /** PRINT ifeq <LABEL>> HERE*/
@@ -368,7 +366,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
     SnappyVariable var = getVariable(ctx.expr(0).getText());
-    System.out.println("visit array access: " + ctx.getText());
     try {
       /** put array reference on stack */
       ctx.expr(0).accept(this);
@@ -393,7 +390,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symbolTable);
     typeCheckVisitor.currentClass = currentClass;
     typeCheckVisitor.currentMethod = currentMethod;
-    System.out.println("visit method call: " + ctx.getText());
     SnappyType leftType = ctx.expr().accept(typeCheckVisitor);
     try {
       /** push left hand expression on the stack(the caller object) */
@@ -404,8 +400,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** get the method that this epression wants to call */
       SnappyMethod m = symbolTable.classes.get(leftType.type).methods.get(ctx.ID().getText());
       jasminWriter.write(JasminUtils.getInvokevirtualString(m, leftType.type));
-      System.out.println("writing method call: " + JasminUtils.getInvokevirtualString(m, leftType.type));
-
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     } finally {
@@ -503,7 +497,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitLTComp(@NotNull SnappyJavaParser.LTCompContext ctx) {
-    System.out.println("visit Less than: " + ctx.getText());
     visitChildren(ctx);
     visitComp(ctx.getChild(1).getText());
     return null;
@@ -518,7 +511,6 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   @Override
   public Object visitAndComp(@NotNull SnappyJavaParser.AndCompContext ctx) {
-    System.out.println("visit AND: " + ctx.getText());
     try {
       visitChildren(ctx);
       jasminWriter.write("\tiand\n");

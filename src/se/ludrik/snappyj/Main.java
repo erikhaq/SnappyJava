@@ -46,6 +46,9 @@ public class Main {
     // Typechecking
     typeCheck(symTable);
 
+    // Stack count
+    stackCount(symTable);
+
     // Generate JVM code
     if(JVMMain.generateJvmCode) {
       generateJVM(symTable);
@@ -65,6 +68,11 @@ public class Main {
     TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symTable);
     typeCheckVisitor.visit(tree);
     exitIfError();
+  }
+
+  private void stackCount(SymbolTable symTable) {
+    StackCountVisitor stackCountVisitor = new StackCountVisitor(symTable);
+    stackCountVisitor.visit(tree);
   }
 
   private void generateJVM(SymbolTable symTable) {

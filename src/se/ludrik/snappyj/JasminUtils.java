@@ -34,13 +34,13 @@ public class JasminUtils {
 
   public static String getConstuctorString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(".method <init>()V \n");
-    sb.append("\t.limit stack 1 \n");
-    sb.append("\t.limit locals 1 \n");
-    sb.append("\taload_0 \n");
-    sb.append("\tinvokenonvirtual java/lang/Object/<init>()V \n");
-    sb.append("\treturn \n");
-    sb.append(".end method\n");
+    sb.append(".method <init>()V\n");
+    sb.append("\t.limit stack 1\n");
+    sb.append("\t.limit locals 1\n");
+    sb.append("\taload_0\n");
+    sb.append("\tinvokenonvirtual java/lang/Object/<init>()V\n");
+    sb.append("\treturn\n");
+    sb.append(".end method\n\n");
 
     return sb.toString();
   }
@@ -61,6 +61,7 @@ public class JasminUtils {
   }
 
   public static String getMethodLimits(int stackLimit, int localLimit) {
+    System.out.println("stackLimit: " + stackLimit + " localLimit: " + localLimit);
     StringBuilder sb = new StringBuilder();
     sb.append("\t.limit stack ");
     sb.append(stackLimit);
@@ -123,6 +124,7 @@ public class JasminUtils {
 
   public static String getAddSubString(String operator) {
     return operator.equals("+") ? "\tiadd\n" : "\tisub\n";
+    //TODO: Lazy evaluation of && and || operators
   }
 
   public static String getLoadString(SnappyVariable var, String className) {
