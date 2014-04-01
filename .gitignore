@@ -17,7 +17,9 @@ src/se/ludrik/snappyj/antlr/SnappyJavaParser.java
 
 # Output files #
 *.s
+*.j
 
 # Misc files #
 ludwig_test.java
 test2.java
+
