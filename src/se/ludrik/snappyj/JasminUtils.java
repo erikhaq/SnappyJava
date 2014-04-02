@@ -61,7 +61,6 @@ public class JasminUtils {
   }
 
   public static String getMethodLimits(int stackLimit, int localLimit) {
-    System.out.println("stackLimit: " + stackLimit + " localLimit: " + localLimit);
     StringBuilder sb = new StringBuilder();
     sb.append("\t.limit stack ");
     sb.append(stackLimit);
