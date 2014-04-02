@@ -2,6 +2,7 @@ package se.ludrik.snappyj;
 
 import java.io.File;
 import java.io.IOException;
+import mjc.JVMMain;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
 import se.ludrik.snappyj.objects.*;
@@ -51,19 +52,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       }
 
       StringBuilder sb = new StringBuilder();
-      sb.append("./jasmin/");
-
-
-      File f = new File(filePath);
-      String fileName = f.getName();
-      String[] s = fileName.split("\\.");
-      sb.append(s[0]);
-      f = new File(sb.toString());
-      f.mkdirs();
+      sb.append(JVMMain.outputDirectory);
       sb.append("/");
       sb.append(className);
       sb.append(".s");
-      //jasminWriter = new BufferxedWriter(new FileWriter("./jasmin/" + className + ".s"));
+
       jasminWriter = new BufferedWriter(new FileWriter(sb.toString()));
       jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
