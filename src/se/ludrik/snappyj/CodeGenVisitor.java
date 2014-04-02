@@ -183,7 +183,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         jasminWriter.write(JasminUtils.getJasminType(v.type));
       }
       jasminWriter.write(JasminUtils.getClosingMethodDeclaration(currentMethod.returnType));
-      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM)); //TODO: real stack size calc
+      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM));
 
       for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
@@ -223,14 +223,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     String elseLabe = JasminUtils.getLabel();
     /** PRINT ifeq <LABEL>> HERE*/
     try {
-      jasminWriter.write("ifeq " + elseLabe + "\n");
+      jasminWriter.write("\tifeq " + elseLabe + "\n");
       ctx.stmt(0).accept(this);
-      jasminWriter.write("goto " + doneLabel + " \n");
-      jasminWriter.write(elseLabe + ":\n");
+      jasminWriter.write("\tgoto " + doneLabel + " \n");
+      jasminWriter.write("\t" + elseLabe + ":\n");
 
       /** Visit the else statement*/
       ctx.stmt(1).accept(this);
-      jasminWriter.write(doneLabel + ":\n");
+      jasminWriter.write("\t" + doneLabel + ":\n");
 
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -505,8 +505,20 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitAndComp(@NotNull SnappyJavaParser.AndCompContext ctx) {
     try {
-      visitChildren(ctx);
-      jasminWriter.write("\tiand\n");
+      String done = JasminUtils.getLabel();
+      String falseLabel = JasminUtils.getLabel();
+      ctx.expr(0).accept(this);
+      /** if equal to 0 jump to false */
+      jasminWriter.write("\tifeq " + falseLabel + "\n");
+      ctx.expr(1).accept(this);
+      /** if equal to 0 jump to false */
+      jasminWriter.write("\tifeq " + falseLabel + "\n");
+      jasminWriter.write("\ticonst_1\n");
+      jasminWriter.write("\tgoto " + done + "\n");
+      //visitChildren(ctx);//TODO fix and comparison so that it does not do right hand side if left fails.
+      jasminWriter.write("\t" + falseLabel+ ":\n");
+      jasminWriter.write("\ticonst_0\n");
+      jasminWriter.write("\t" + done+ ":\n");
     } catch (IOException e) {
       e.printStackTrace();
     } finally {

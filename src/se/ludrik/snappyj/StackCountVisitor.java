@@ -84,11 +84,14 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   }
 
   @Override public Integer visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
-    return ctx.expr().accept(this);
+    int isField = 0;
+    String varName = ctx.ID().getText();
+    if(currentClass.fields.containsKey(varName)) isField = 1;
+    return ctx.expr().accept(this) + isField;
   }
 
   @Override public Integer visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
-    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this)) + 1; //+1 for array obj. ref.
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1) + 1; //+1 for array obj. ref.
   }
 
   @Override public Integer visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
@@ -96,11 +99,11 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   }
 
   @Override public Integer visitArrayExp(@NotNull SnappyJavaParser.ArrayExpContext ctx) {
-    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this));
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1);
   }
 
   @Override public Integer visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
-    return Math.max(ctx.expr().accept(this), ctx.exprList().accept(this));
+    return Math.max(ctx.expr().accept(this), ctx.exprList().accept(this)+1);
   }
 
   @Override public Integer visitExprList(@NotNull SnappyJavaParser.ExprListContext ctx) {
@@ -113,11 +116,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
     for(SnappyJavaParser.ExprRestContext exprRest : ctx.exprRest()) {
       maxStackSize = Math.max(maxStackSize, exprRest.expr().accept(this) + paramCount++);
     }
-    return maxStackSize++;
-  }
-
-  @Override public Integer visitExprRest(@NotNull SnappyJavaParser.ExprRestContext ctx) {
-    return ctx.expr().accept(this);
+    return maxStackSize;
   }
 
   @Override public Integer visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
@@ -128,8 +127,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
     return ctx.expr().accept(this) + 1; //+1 for the '!'
   }
 
-  @Override public Integer visitNewIntArrayExp(
-      @NotNull SnappyJavaParser.NewIntArrayExpContext ctx) {
+  @Override public Integer visitNewIntArrayExp(@NotNull SnappyJavaParser.NewIntArrayExpContext ctx) {
     return ctx.expr().accept(this);
   }
 
@@ -166,10 +164,10 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   }
 
   @Override public Integer visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
-    return 0;
+    return 1;
   }
 
   @Override public Integer visitThisExp(@NotNull SnappyJavaParser.ThisExpContext ctx) {
-    return 0;
+    return 1;
   }
 }
