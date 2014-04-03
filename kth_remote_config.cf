@@ -1,0 +1,24 @@
+## To configurate password-less ssh-login to KTH servers ##
+
+> nano ~/.ssh/config
+
+paste and save (and edit username):
+
+  Host *
+    ForwardX11 yes
+  Host *.nada.kth.se *.nada.kth.se. *.csc.kth.se *.csc.kth.se. *.pdc.kth.se *.pdc.kth.se.
+    User «username»
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials yes
+    GSSAPIKeyExchange yes
+  Host *.*
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+    GSSAPIKeyExchange yes
+
+> kinit -f username@NADA.KTH.SE
+
+
+sources:
+	http://www.kth.se/en/csc/it-support-csc/environment/remote/remote-1.70565
+	http://www.kth.se/csc/it-support-csc/environment/remote/gssapi-1.70832
