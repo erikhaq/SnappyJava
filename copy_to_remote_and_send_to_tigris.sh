@@ -1,5 +1,6 @@
 #! /bin/sh
 ## shoutout to dj guseng ##
+## remember to change username ##
 filepath=`pwd`
 echo "Working directory is "$filepath
 cd ..
