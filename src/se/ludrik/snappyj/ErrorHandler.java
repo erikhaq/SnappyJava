@@ -154,6 +154,14 @@ public class ErrorHandler extends BaseErrorListener {
     }
     setErrorDetected();
   }
+  public static void cantCreateMultiDimensional(Token exprToken, String text, String location) {
+    if (JVMMain.printErrors) {
+      System.err.printf(
+              "Error:(%d, %d) java: cannot create multidimensional array\n\tsymbol:\t\t %s\n\tlocation:\t%s\n",
+              exprToken.getLine(), exprToken.getCharPositionInLine(), text, location);
+    }
+    setErrorDetected();
+  }
 
   @Override
   public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
