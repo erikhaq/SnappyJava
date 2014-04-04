@@ -1,11 +1,10 @@
 grammar SnappyJava;
 
-program     : mainClass (classDecl)* ;
-
+program     : mainClass (classDecl)*;
 mainClass   : CLASS ID LBRACE MAIN LPAREN STRING LBRACK RBRACK ID RPAREN LBRACE (varDecl)* (stmt)* RBRACE RBRACE;
-classDecl   : CLASS ID LBRACE (varDecl)* (methodDecl)* RBRACE ;
+classDecl   : CLASS ID LBRACE (varDecl)* (methodDecl)* RBRACE;
 varDecl     : type ID ENDL;
-methodDecl  : PUBLIC type ID LPAREN formalList RPAREN LBRACE (varDecl)* (stmt)* RETURN expr ENDL RBRACE ;
+methodDecl  : PUBLIC type ID LPAREN formalList RPAREN LBRACE (varDecl)* (stmt)* RETURN expr ENDL RBRACE;
 
 formalList
   : type ID (formalRest)*
