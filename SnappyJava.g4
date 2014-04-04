@@ -2,7 +2,7 @@ grammar SnappyJava;
 
 program     : mainClass (classDecl)* ;
 
-mainClass   : CLASS ID LBRACE PUBLIC STATIC VOID 'main' LPAREN STRING LBRACK RBRACK ID RPAREN LBRACE (varDecl)* (stmt)* RBRACE RBRACE;
+mainClass   : CLASS ID LBRACE PUBLIC STATIC VOID ID LPAREN STRING LBRACK RBRACK ID RPAREN LBRACE (varDecl)* (stmt)* RBRACE RBRACE;
 classDecl   : CLASS ID LBRACE (varDecl)* (methodDecl)* RBRACE;
 varDecl     : type ID ENDL;
 methodDecl  : PUBLIC type ID LPAREN formalList RPAREN LBRACE (varDecl)* (stmt)* RETURN expr ENDL RBRACE;
