@@ -22,3 +22,5 @@ paste and save (and edit username):
 sources:
 	http://www.kth.se/en/csc/it-support-csc/environment/remote/remote-1.70565
 	http://www.kth.se/csc/it-support-csc/environment/remote/gssapi-1.70832
+
+ssh erikhaq@u-shell.csc.kth.se
