@@ -23,8 +23,9 @@ public class JasminUtils {
   public static String getFieldString(String id, SnappyType type) {
     /** */
     StringBuilder sb = new StringBuilder();
-    sb.append(".field ");
+    sb.append(".field '");
     sb.append(id);
+    sb.append("'");
     sb.append(" ");
     sb.append(getJasminType(type));
     sb.append("\n");

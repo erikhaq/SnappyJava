@@ -60,7 +60,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter = new BufferedWriter(new FileWriter(sb.toString()));
       jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
-      jasminWriter.write(".class\t" + className + "\n");
+      jasminWriter.write(".class\t" + "'" + className + "'" + "\n");
       jasminWriter.write(".super\tjava/lang/Object" + "\n\n");
     } catch (IOException e) {
       e.printStackTrace();
@@ -448,7 +448,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   public Object visitNewIdExp(@NotNull SnappyJavaParser.NewIdExpContext ctx) {
     try {
       String className = ctx.ID().getText();
-      jasminWriter.write("\tnew " + className + "\n"); // create a new object reference
+      jasminWriter.write("\tnew '" + className + "'\n"); // create a new object reference
       jasminWriter.write("\tdup\n");                            // duplicate so we can invoke the constructor
       jasminWriter.write("\tinvokespecial " + className + "/<init>()V\n");
     } catch (IOException e) {
