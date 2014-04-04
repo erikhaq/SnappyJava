@@ -199,7 +199,10 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
   @Override
   public SnappyType visitSout(@NotNull SoutContext ctx) {
-    ctx.expr().accept(this);
+    SnappyType inner = ctx.expr().accept(this);
+    if(!inner.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, inner.type);
+    }
     return null;
   }
 
@@ -222,6 +225,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyVariable id = getVariable(ctx.ID().getText());
     SnappyType innerExp = ctx.expr(0).accept(this);
     SnappyType assingExp = ctx.expr(1).accept(this);
+
     if(id == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else if(!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
@@ -298,6 +302,9 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     // get type of the left expression
     SnappyType leftType = ctx.expr(0).accept(this);
     SnappyType innerType = ctx.expr(1).accept(this);
+    if(ctx.expr(0) instanceof NewIntArrayExpContext) {
+      ErrorHandler.cantCreateMultiDimensional(ctx.getStart(), ctx.getText(), currentMethod.id);
+    }
 
     if(!leftType.equals(SnappyType.INT_ARRAY_TYPE)) {
       // ERROR, Left type must be of INT_ARRAY
