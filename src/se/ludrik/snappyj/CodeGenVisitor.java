@@ -161,14 +161,10 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       String fieldString = JasminUtils.getFieldString(varName, var.type);
       try {
         jasminWriter.write(fieldString);
-
       } catch (IOException e) {
         System.err.println("could not write to file\n");
       }
-
     }
-
-
     return null;
   }
 
@@ -196,6 +192,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }finally {
+      currentMethod = null;
       return null;
     }
   }
