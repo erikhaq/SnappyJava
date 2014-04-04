@@ -1,5 +1,6 @@
 class Factorial2{
     public static void main(String[] a){
+      int main;
       int x;
       int[] array;
       Fac b;
