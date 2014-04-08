@@ -100,6 +100,7 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     if(currentMethod != null){
       // this variable belongs to a method.
       if(currentMethod.variables.containsKey(varId) || currentMethod.parameters.containsKey(varId)) {
+
         ErrorHandler.variableAlreadyDefinedInMethod(ctx.ID().getSymbol(), currentMethod.id);
         return null;
       }

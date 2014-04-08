@@ -296,6 +296,18 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     return opType;
   }
 
+  @Override public SnappyType visitCEQComp(@NotNull CEQCompContext ctx) {
+    SnappyType opType = ctx.expr(0).accept(this);
+    doOpCheck(ctx.expr(0), ctx.expr(1), opType);
+    return SnappyType.BOOL_TYPE;
+  }
+
+  @Override public SnappyType visitCNEComp(@NotNull CNECompContext ctx) {
+    SnappyType opType = ctx.expr(0).accept(this);
+    doOpCheck(ctx.expr(0), ctx.expr(1), opType);
+    return SnappyType.BOOL_TYPE;
+  }
+
   @Override
   public SnappyType visitArrayExp(@NotNull ArrayExpContext ctx) {
     SnappyType returnType = SnappyType.INT_TYPE;

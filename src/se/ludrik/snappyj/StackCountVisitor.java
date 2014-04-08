@@ -155,6 +155,14 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
     return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1); //+1 for right side
   }
 
+  @Override public Integer visitCEQComp(@NotNull SnappyJavaParser.CEQCompContext ctx) {
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1); //+1 for right side
+  }
+
+  @Override public Integer visitCNEComp(@NotNull SnappyJavaParser.CNECompContext ctx) {
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1); //+1 for right side
+  }
+
   @Override public Integer visitNumExp(@NotNull SnappyJavaParser.NumExpContext ctx) {
     return 1;
   }

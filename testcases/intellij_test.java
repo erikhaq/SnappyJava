@@ -1,4 +1,33 @@
-class Factorial2{
+class Test {
+  public static void main(String[] args) {
+    CEQ c;
+    boolean b;
+    c = new CEQ();
+    b = c == c;
+    /*if(1 == 1) {
+      System.out.println(1);
+    } else {
+      System.out.println(0);
+    }*/
+  }
+}
+
+class CEQ {
+  /*public int test1() {
+    int x;
+    int y;
+    x = 2;
+    y = 1;
+    //if(x == y) {
+    //  return true;
+    //} else {
+    //  return false;
+    //}
+    return 0;
+  }*/
+}
+
+/*class Factorial2{
     public static void main(String[] a){
       int main;
       int x;
@@ -36,3 +65,4 @@ class Fac {
     }
 
 }
+*/

@@ -44,6 +44,8 @@ expr
   | expr (LT|LTE) expr                    # LTComp
   | expr (GT|GTE) expr                    # GTComp
   | expr AND expr                         # AndComp
+  | expr CEQ expr                         # CEQComp
+  | expr CNE expr                         # CNEComp
   | NUM                                   # NumExp
   | boolLiterals                          # BoolExp
   | ID                                    # IdExp
@@ -112,6 +114,8 @@ GTE         : '>=';
 ADD         : '+' ;
 SUB         : '-' ;
 MUL         : '*' ;
+CEQ         : '==';
+CNE         : '!=';
 
 // Misc
 ID          : LETTER (LETTER|DIGIT)*;

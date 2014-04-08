@@ -244,18 +244,18 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** Print the loopLabel here */
       String loopLabel = JasminUtils.getLabel();
       String doneLabel = JasminUtils.getLabel();
-      jasminWriter.write(loopLabel + ":\n");
+      jasminWriter.write("\t" + loopLabel + ":\n");
 
       /** visit the while expression*/
       ctx.expr().accept(this);
       /** print ifeq doneLabel*/
-      jasminWriter.write("ifeq " + doneLabel + "\n");
+      jasminWriter.write("\tifeq " + doneLabel + "\n");
       /** Visit the while statement*/
       ctx.stmt().accept(this);
       /** print Goto looplabel */
-      jasminWriter.write("goto " + loopLabel + "\n");
+      jasminWriter.write("\tgoto " + loopLabel + "\n");
       /** print doneLabel */
-      jasminWriter.write(doneLabel + ":\n");
+      jasminWriter.write("\t" + doneLabel + ":\n");
 
 
     } catch (IOException e) {
@@ -291,7 +291,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
 
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
@@ -521,6 +521,56 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     } finally {
       return null;
     }
+  }
+
+  public void visitCEQCNEComp(String comparator, SnappyJavaParser.ExprContext ctx) {
+    try {
+      TypeCheckVisitor typechecker = new TypeCheckVisitor(symbolTable);
+      typechecker.currentClass = currentClass;
+      typechecker.currentMethod = currentMethod;
+      SnappyType exprType = ctx.getChild(0).accept(typechecker);
+
+      String falseLabel = JasminUtils.getLabel();
+      String doneLabel = JasminUtils.getLabel();
+      String eqCmpString, neCmpString;
+
+      if (exprType.equals(SnappyType.BOOL_TYPE) || exprType.equals(SnappyType.INT_TYPE)) {
+        eqCmpString = "if_icmpeq";
+        neCmpString = "if_icmpne";
+      } else {  //comparing references
+        eqCmpString = "if_acmpeq";
+        neCmpString = "if_acmpne";
+      }
+
+      if (comparator.equals("==")) {
+        jasminWriter.write("\t" + neCmpString + " " + falseLabel + "\n");
+        jasminWriter.write("\ticonst_1\n");
+      } else { //comparator == "!="
+        jasminWriter.write("\t" + eqCmpString + " " + falseLabel + "\n");
+        jasminWriter.write("\ticonst_1\n");
+      }
+
+      jasminWriter.write("\tgoto " + doneLabel + "\n");
+      jasminWriter.write("\t" + falseLabel + ":\n");
+      jasminWriter.write("\ticonst_0\n");
+      jasminWriter.write("\t" + doneLabel + ":\n");
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  @Override public Object visitCEQComp(@NotNull SnappyJavaParser.CEQCompContext ctx) {
+    visitChildren(ctx);
+    visitCEQCNEComp(ctx.getChild(1).getText(), ctx);
+    return null;
+  }
+
+  @Override public Object visitCNEComp(@NotNull SnappyJavaParser.CNECompContext ctx) {
+    visitChildren(ctx);
+    visitCEQCNEComp(ctx.getChild(1).getText(), ctx);
+    return null;
   }
 
   @Override
