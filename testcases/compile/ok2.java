@@ -11,7 +11,7 @@ class Main
         System.out.println(1337);
         b = a.f(30, true);
 
-	   System.out.println(b);
+	   // System.out.println(b);
 
     }
 }

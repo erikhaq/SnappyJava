@@ -41,7 +41,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }
 
   }
@@ -61,7 +61,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
       jasminWriter.write(".class\t" + "'" + className + "'" + "\n");
-      jasminWriter.write(".super\tjava/lang/Object" + "\n\n");
+      if(currentClass.extendedClass != null) {
+        jasminWriter.write(".super\t'" + currentClass.extendedClass.id + "'\n\n");
+      } else {
+        jasminWriter.write(".super\tjava/lang/Object" + "\n\n");
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -80,7 +84,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   public SnappyVariable getVariable(String var) {
     // Try to get var from fields. If it does not exist it will return null
-    SnappyVariable v = currentClass.fields.get(var);
+    SnappyVariable v = currentClass.getVariable(var);
     if(currentMethod != null) {
       // check if variable is bound harder for method
       if(currentMethod.parameters.containsKey(var)) {
@@ -135,7 +139,13 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       v.accept(this);
     }
 
-    String constructor = JasminUtils.getConstuctorString();
+    String constructor;
+    if(currentClass.extendedClass != null) {
+      constructor = JasminUtils.getConstructorString(currentClass.extendedClass.id);
+    } else {
+      constructor = JasminUtils.getConstuctorString();
+    }
+
     try {
       jasminWriter.write(constructor);
     } catch (IOException e) {
@@ -171,6 +181,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     currentMethod = currentClass.methods.get(ctx.ID().getText());
+
     String methodString = JasminUtils.getOpeningMethodDeclaration(currentMethod.id);
     try {
       jasminWriter.write(methodString);
@@ -184,13 +195,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
       }
+
       /**  Write the return statement */
       ctx.expr().accept(this);
       jasminWriter.write(JasminUtils.getReturnString(currentMethod.returnType));
       jasminWriter.write(".end method\n\n");
 
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }finally {
       currentMethod = null;
       return null;
@@ -449,7 +461,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\tdup\n");                            // duplicate so we can invoke the constructor
       jasminWriter.write("\tinvokespecial " + className + "/<init>()V\n");
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      System.err.println("Error");
+      e.printStackTrace();
     } finally {
       return null;
     }

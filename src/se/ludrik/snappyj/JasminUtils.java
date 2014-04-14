@@ -33,17 +33,23 @@ public class JasminUtils {
   }
 
   public static String getConstuctorString() {
+    return getConstructorString("java/lang/Object");
+  }
+
+  public static String getConstructorString(String superClass) {
     StringBuilder sb = new StringBuilder();
     sb.append(".method <init>()V\n");
     sb.append("\t.limit stack 1\n");
     sb.append("\t.limit locals 1\n");
     sb.append("\taload_0\n");
-    sb.append("\tinvokenonvirtual java/lang/Object/<init>()V\n");
+    sb.append("\tinvokenonvirtual ");
+    sb.append(superClass);
+    sb.append("/<init>()V\n");
     sb.append("\treturn\n");
     sb.append(".end method\n\n");
-
     return sb.toString();
   }
+
   public static String getOpeningMethodDeclaration(String methodId) {
     StringBuilder sb = new StringBuilder();
     sb.append(".method public ");
@@ -89,8 +95,12 @@ public class JasminUtils {
   public static String getReturnString(SnappyType returnType) {
     StringBuilder sb = new StringBuilder();
     sb.append("\t");
-    if(returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE))sb.append("ireturn ");
-    else sb.append("areturn ");
+    if(returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE)) {
+      sb.append("ireturn ");
+    }
+    else {
+      sb.append("areturn ");
+    }
     sb.append("\n");
     return sb.toString();
   }

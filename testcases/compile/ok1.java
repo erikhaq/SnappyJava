@@ -6,7 +6,7 @@ class Main
     public static void main(String[] s) 
     {
 
-	System.out.println(new B());
+	// System.out.println(new B());
     }
 }
 
