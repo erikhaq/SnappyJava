@@ -400,7 +400,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       ctx.exprList().accept(this);
 
       /** get the method that this epression wants to call */
-      SnappyMethod m = symbolTable.classes.get(leftType.type).methods.get(ctx.ID().getText());
+      SnappyMethod m = symbolTable.classes.get(leftType.type).getMethod(ctx.ID().getText());
       jasminWriter.write(JasminUtils.getInvokevirtualString(m, leftType.type));
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
