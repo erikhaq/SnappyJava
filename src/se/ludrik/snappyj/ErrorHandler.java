@@ -163,10 +163,16 @@ public class ErrorHandler extends BaseErrorListener {
     setErrorDetected();
   }
 
+  public static void cyclicInheritance(Token classIdToken, String classId) {
+    // Error:(211, 1) java: cyclic inheritance involving se.ludrik.snappyj.TestCircle
+    System.err.printf("Error:(%d, %d) java: cyclic inheritance involving %s\n", classIdToken.getLine(), classIdToken.getCharPositionInLine(), classId);
+  }
+
   @Override
   public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol,
       int line, int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
     if (JVMMain.printErrors) System.err.printf("line %d:%d: %s\n", line, charPositionInLine, msg);
     setErrorDetected();
   }
+
 }

@@ -1,8 +1,11 @@
 package se.ludrik.snappyj;
 
+import java.util.LinkedList;
 import org.antlr.v4.runtime.misc.NotNull;
 import se.ludrik.snappyj.antlr.*;
 import se.ludrik.snappyj.objects.*;
+import se.ludrik.snappyj.antlr.SnappyJavaParser.ClassDeclContext;
+import se.ludrik.snappyj.antlr.SnappyJavaParser.ExtendContext;
 
 /**
  * Symbol table visitor
@@ -14,7 +17,73 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
   public SymbolTableVisitor(SymbolTable table) {
     symbolTable = table;
+  }
 
+  @Override public Object visitProgram(@NotNull SnappyJavaParser.ProgramContext ctx) {
+    ctx.mainClass().accept(this);
+
+    // All this is needed to make sure super classes are always added first to the symbol table
+
+    // Linked list that will hold all ClassDeclContexts in the right order
+    LinkedList<ClassDeclContext> classDeclContexts = new LinkedList<ClassDeclContext>();
+
+    for(ClassDeclContext classCtx : ctx.classDecl()) {
+      ExtendContext extendContext = classCtx.extend();
+      if(extendContext != null) {
+        // This class extends another class.
+        // We want to make sure it is placed in the list so that,
+        // firstly, it is put in front of any class that extends it, and
+        // secondly, after the class that it extends (if present in list,
+        // otherwise place last)
+        String thisExtendsClassName = extendContext.ID().getText(); // This class' extended class name
+        String thisClassName = classCtx.ID().getText();             // This class' name
+        String currClassName;                                       // Current class name from iterating the linked list
+        String currClassExtendsName;                                // Current class' extended class from iterating list
+        ClassDeclContext currClassCtx;                              // Current classCtx from iterating list
+        boolean added = false;
+        for (int i = 0; i < classDeclContexts.size(); i++) {
+          added = false;
+          currClassCtx = classDeclContexts.get(i);
+          currClassName = currClassCtx.ID().getText();
+          if(currClassCtx.extend() != null) {
+            // The class at position i in the linked list extends another class
+            currClassExtendsName = currClassCtx.extend().ID().getText();
+            if(currClassExtendsName.equals(thisClassName)) {
+              // The class in the linked list extends the class we are currently
+              // trying to add, so we add it in front of this class.
+              classDeclContexts.add(i, classCtx);
+              added = true;
+              break;
+            }
+          } else {
+            if(thisExtendsClassName.equals(currClassName)) {
+              // The class we are trying to add extends this class in the linked list
+              // so we add it after this class.
+              classDeclContexts.add(i+1, classCtx);
+              added = true;
+              break;
+            }
+          }
+        }
+        if(!added) {
+          // The class we are trying to add extends a class not yet
+          // present in the linked list so we add it last.
+          classDeclContexts.add(classCtx);
+        }
+
+      } else {
+        // This class does not extend any other class, just add it to front of list
+        classDeclContexts.addFirst(classCtx);
+      }
+    }
+
+    // Visits all contexts in the right order
+    for(ClassDeclContext c : classDeclContexts) {
+      //System.out.println(c.ID().getText());
+      c.accept(this);
+    }
+
+    return null;
   }
 
   @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
@@ -32,15 +101,28 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     return null;
   }
 
-  @Override public Object visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
+  @Override public Object visitClassDecl(@NotNull ClassDeclContext ctx) {
     String className = ctx.ID().getText();
 
     if(symbolTable.classes.containsKey(className)) {
       ErrorHandler.classAlreadyDefined(ctx.ID().getSymbol());
       return null;
     }
+    
+    if(ctx.extend() != null) {
+      SnappyClass extendedClass = symbolTable.getClass(ctx.extend().ID().getText());
 
-    currentClass = symbolTable.addClass(className);
+      // "Perfect" check for cyclic inheritance :P
+      if(extendedClass == null) {
+        ErrorHandler.cyclicInheritance(ctx.ID().getSymbol(), className);
+        return null;
+      }
+
+      currentClass = symbolTable.addClass(className, extendedClass);
+    } else {
+      currentClass = symbolTable.addClass(className);
+    }
+
 
     for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
@@ -67,7 +149,13 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
     for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
-
+    /*
+    System.out.println("-----------------------------------");
+    System.out.println("classid: " + currentClass.id);
+    System.out.println(currentMethod);
+    System.out.println("-----------------------------------");
+    System.out.println();
+    */
     currentMethod = null;
     return null;
 
@@ -119,3 +207,4 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
  }
 
 }
+

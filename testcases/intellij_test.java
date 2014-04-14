@@ -1,14 +1,90 @@
-class Test {
+
+class FieldInheritence{
+  public static void main(String[] args) {
+    System.out.println(new Field().test());
+  }
+
+}
+
+class Field3 extends Field2 {
+
+}
+
+class Field2 extends Field {
+  public int getI() {
+    return i;
+  }
+
+}
+
+class Field {
+
+  int i;
+  Field f;
+  int[] a;
+
+  public int test() {
+    Field2 f;
+    int r;
+    f = new Field2();
+
+    r =f.setI(101);
+    r = f.getI();
+    return 5;
+  }
+
+  public int setI(int v) {
+    i = v;
+    return 0;
+  }
+
+}
+
+
+class TestSuper {
+  TestSub testSub;
+  TestSuper testSuper;
+  public int testmethod() {
+    testSub = new TestSub();
+    testSuper = new TestSubSub();
+    return 1;
+  }
+
+}
+
+class TestSub extends TestSuper {
+  TestSuper t;
+  public int testmethod() {
+    t = new TestSub();
+    return 0;
+  }
+}
+
+class TestSubSub extends TestSub {
+
+}
+
+//class TestCircle extends TestCircle2 {
+//
+//}
+
+//class TestCircle2 extends TestCircle {
+//
+//}
+
+
+
+/*class Test {
   public static void main(String[] args) {
     CEQ c;
-    boolean b;
-    c = new CEQ();
-    b = c == c;
+    //boolean b;
+    c = new Blap();
+    //b = c == c;
     /*if(1 == 1) {
       System.out.println(1);
     } else {
       System.out.println(0);
-    }*/
+    }
   }
 }
 
@@ -24,7 +100,11 @@ class CEQ {
     //  return false;
     //}
     return 0;
-  }*/
+  }
+}
+
+class Blap extends CEQ {
+
 }
 
 /*class Factorial2{

@@ -2,7 +2,7 @@ grammar SnappyJava;
 
 program     : mainClass (classDecl)*;
 mainClass   : CLASS ID LBRACE MAIN LPAREN STRING LBRACK RBRACK ID RPAREN LBRACE (varDecl)* (stmt)* RBRACE RBRACE;
-classDecl   : CLASS ID LBRACE (varDecl)* (methodDecl)* RBRACE;
+classDecl   : CLASS ID (extend)? LBRACE (varDecl)* (methodDecl)* RBRACE;
 varDecl     : type ID ENDL;
 methodDecl  : PUBLIC type ID LPAREN formalList RPAREN LBRACE (varDecl)* (stmt)* RETURN expr ENDL RBRACE;
 
@@ -76,6 +76,10 @@ boolLiterals
   : (TRUE|FALSE)
   ;
 
+extend
+  : 'extends' ID
+  ;
+
 // Keywords
 BOOLEAN     : 'boolean';
 STRING      : 'String';
@@ -95,6 +99,7 @@ LENGTH      : 'length';
 TRUE        : 'true';
 FALSE       : 'false';
 MAIN        : PUBLIC WS+ STATIC WS+ VOID WS+ 'main';
+
 // Separators
 LPAREN      : '(';
 RPAREN      : ')';

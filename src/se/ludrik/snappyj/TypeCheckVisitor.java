@@ -25,7 +25,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
   public SnappyVariable getVariable(String var) {
     // Try to get var from fields. If it does not exist it will return null
-    SnappyVariable v = currentClass.fields.get(var);
+    SnappyVariable v = currentClass.getVariable(var);
     if(currentMethod != null) {
       // check if variable is bound harder for method
       if(currentMethod.parameters.containsKey(var)) {
@@ -36,6 +36,20 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     }
 
     return v;
+  }
+
+  public boolean isCompatibleTypes(SnappyType left, SnappyType right) {
+    if(left.equals(right)) {
+      return true;
+    }
+
+    // Check if right side is an instance of a class that extends left side (implicit casting)
+    SnappyType newRight = symbolTable.getExtendedType(right.type);
+    if(newRight != null) {
+      return isCompatibleTypes(left, newRight);
+    } else {
+      return false;
+    }
   }
 
 
@@ -213,7 +227,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
     if(left == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
-    } else if(!left.type.equals(rightExp)) {
+    } else if(!isCompatibleTypes(left.type, rightExp)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), left.type.toString(), rightExp.type );
     }
     return null;
@@ -230,7 +244,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else if(!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
       // the left hand side identifier is not of type INT_ARRAY!
-      System.out.println("BOEg");
       ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), SnappyType.INT_ARRAY_TYPE.type, id.type.toString());
     }
     // check that inner expression is of type INT_TYPE
@@ -352,13 +365,13 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     } else if(symbolTable.classes.containsKey(classType.type)) {
       SnappyClass leftClass = symbolTable.classes.get(classType.type);
       String methodName = ctx.ID().getText();
-      if(!leftClass.methods.containsKey(methodName)) {
+      if(!leftClass.hasMethod(methodName)) {
 
         ErrorHandler.noSuchMethod(ctx.ID().getSymbol(), classType.type);
       } else {
 
         // check that parameters in exprlist are of same type as declared in method methodName
-        SnappyMethod method = leftClass.methods.get(methodName);
+        SnappyMethod method = leftClass.getMethod(methodName);
         returnType = method.returnType;
         // First check that number of parameters defined in method is same as inserted in current method call
         // Also don't enter block if there are no parameters to check.
