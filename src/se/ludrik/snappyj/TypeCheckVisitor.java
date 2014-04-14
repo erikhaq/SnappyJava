@@ -134,7 +134,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     //visit return expression
     SnappyType returnExpr = ctx.expr().accept(this);
 
-    if(!returnType.equals(returnExpr)) {
+    if(!isCompatibleTypes(returnType, returnExpr)) {
       // the return expression is not same as return type
       ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
 
