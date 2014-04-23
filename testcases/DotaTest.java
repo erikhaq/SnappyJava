@@ -1,3 +1,10 @@
+// EXT:ISC
+// EXT:ICG
+// EXT:CLE
+// EXT:CGE
+// EXT:CEQ
+// EXT:CNE
+
 class AncientApparition {
   public static void main(String[] spiritBreaker) {
     int res;
@@ -30,7 +37,6 @@ class AncientApparition {
     } else {
       System.out.println(2147483647+1);
     }
-
   }
 
 }
@@ -42,7 +48,7 @@ class DefenseOfTheAncients {
     int sangeandyasha;
     sangeandyasha = s.getSomeStrangeNumber()*s.getXAndY()-s.getXAndY()*s.setXandY();
     divinerapier = n.getXAndY()*n.getX()*n.getX()*n.getXAndY();
-    if(s == n && (sangeandyasha == divinerapier) && (sangeandyasha != sangeandyasha) && (divinerapier >= sangeandyasha) && (sangeandyasha <= divinerapier)) {
+    if(s == n && sangeandyasha == divinerapier && sangeandyasha != sangeandyasha && divinerapier >= sangeandyasha && sangeandyasha <= divinerapier) {
       returnval = true;
     } else {
       returnval = false;
