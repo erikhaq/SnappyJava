@@ -43,9 +43,9 @@ expr
   | expr (ADD|SUB) expr                   # AddSubOp
   | expr (LT|LTE) expr                    # LTComp
   | expr (GT|GTE) expr                    # GTComp
-  | expr AND expr                         # AndComp
   | expr CEQ expr                         # CEQComp
   | expr CNE expr                         # CNEComp
+  | expr AND expr                         # AndComp
   | NUM                                   # NumExp
   | boolLiterals                          # BoolExp
   | ID                                    # IdExp

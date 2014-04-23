@@ -261,43 +261,34 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType leftType = leftCtx.accept(this);
     SnappyType rightType = rightCtx.accept(this);
     if(!leftType.equals(opType)) {
-      ErrorHandler.incompatibleTypes(leftCtx.getStart(),opType.type, leftType.type );
+      ErrorHandler.incompatibleTypes(leftCtx.getStart(), opType.type, leftType.type);
     }
     if(!rightType.equals(opType)) {
-      ErrorHandler.incompatibleTypes(rightCtx.getStart(),opType.type, rightType.type );
+      ErrorHandler.incompatibleTypes(rightCtx.getStart(), opType.type, rightType.type);
     }
   }
 
   @Override
   public SnappyType visitMultiOp(@NotNull MultiOpContext ctx) {
-
-
     doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
-
     return SnappyType.INT_TYPE;
   }
 
   @Override
   public SnappyType visitAddSubOp(@NotNull AddSubOpContext ctx) {
-
     doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
-
     return SnappyType.INT_TYPE;
   }
 
   @Override
   public SnappyType visitLTComp(@NotNull LTCompContext ctx) {
-
     doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
-
     return SnappyType.BOOL_TYPE;
   }
 
   @Override
   public SnappyType visitGTComp(@NotNull GTCompContext ctx) {
-
     doOpCheck(ctx.expr(0), ctx.expr(1), SnappyType.INT_TYPE);
-
     return SnappyType.BOOL_TYPE;
   }
 
@@ -310,14 +301,20 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   @Override public SnappyType visitCEQComp(@NotNull CEQCompContext ctx) {
-    SnappyType opType = ctx.expr(0).accept(this);
-    doOpCheck(ctx.expr(0), ctx.expr(1), opType);
+    SnappyType leftType = ctx.expr(0).accept(this);
+    SnappyType rightType = ctx.expr(1).accept(this);
+    if(!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
+      ErrorHandler.incompatibleTypes(ctx.getStart(), leftType.type, rightType.type);
+    }
     return SnappyType.BOOL_TYPE;
   }
 
   @Override public SnappyType visitCNEComp(@NotNull CNECompContext ctx) {
-    SnappyType opType = ctx.expr(0).accept(this);
-    doOpCheck(ctx.expr(0), ctx.expr(1), opType);
+    SnappyType leftType = ctx.expr(0).accept(this);
+    SnappyType rightType = ctx.expr(1).accept(this);
+    if(!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
+      ErrorHandler.incompatibleTypes(ctx.getStart(), leftType.type, rightType.type);
+    }
     return SnappyType.BOOL_TYPE;
   }
 
@@ -401,7 +398,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
             if(!currInputType.equals(currDeclType)) {
               // invalid method parameters
               foundError = true;
-
             }
           }
 
