@@ -26,7 +26,7 @@ public class JVMMain {
     } else {
       //System.err.println("Please specify a filename");
       System.err.println("Using default file.");
-      filePath = "testcases/intellij_test.java";
+      filePath = "testcases/DotaTest.java";
       //System.exit(1);
       //return;
     }

@@ -1,5 +1,29 @@
+class hej {
+  public static void main(String[] args) {
+    // A a;
+    // B b;
+    boolean a;
+    int b;
+    a = true;
+    b = 4;
+    if(a == b) {
+      System.out.println(1);
+    } else {
+      System.out.println(0);
+    }
+  }
+}
 
-class FieldInheritence{
+class A {
+
+}
+
+class B {
+
+}
+
+
+/*class FieldInheritence{
   public static void main(String[] args) {
     System.out.println(new Field().test());
   }
