@@ -149,7 +149,7 @@ class Blap extends CEQ {
 class Fac {
   int a;
   Fac b;
-  public int bajs() {
+  public int frac() {
     return 3;
   }
   public int[] DoWork(int h, int hej, int abba) {
