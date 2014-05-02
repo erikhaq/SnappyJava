@@ -60,7 +60,7 @@ public class SymbolTable {
   public SnappyType getExtendedType(String classId) {
     SnappyType type = null;
     SnappyClass subClass = getClass(classId);
-    if(subClass.extendedClass != null) {
+    if(subClass != null && subClass.extendedClass != null) {
       type = new SnappyType(subClass.extendedClass.id);
     }
     return type;

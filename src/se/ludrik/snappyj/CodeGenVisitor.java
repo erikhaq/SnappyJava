@@ -106,6 +106,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
     //Declare main method
     try {
+
+      jasminWriter.write(JasminUtils.getConstuctorString());
       jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
       jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM));
 
