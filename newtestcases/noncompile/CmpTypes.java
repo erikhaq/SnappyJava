@@ -1,3 +1,5 @@
+// EXT:CEQ
+
 class CmpTypes {
   public static void main(String[] stringis) {
     TorbjornGranlund t;
