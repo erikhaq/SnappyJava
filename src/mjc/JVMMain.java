@@ -13,7 +13,6 @@ public class JVMMain {
   public static String outputDirectory = ".";
 
   public static void main(String[] args) {
-
     //printArgs(args);
 
     String filePath;
@@ -24,11 +23,11 @@ public class JVMMain {
       int oIndex = readOption("-o", args);
       if(oIndex > 0) outputDirectory = readStringArg(oIndex, args);
     } else {
-      //System.err.println("Please specify a filename");
-      System.err.println("Using default file.");
-      filePath = "testcases/DotaTest.java";
-      //System.exit(1);
-      //return;
+      System.err.println("Please specify a filename");
+      //System.err.println("Using default file.");
+      //filePath = "student-tests-2014/execute/2014G06/ExtendMainManyEquals.java";
+      System.exit(1);
+      return;
     }
 
     try {
@@ -65,3 +64,6 @@ public class JVMMain {
     System.err.println();
   }
 }
+
+
+class M {}

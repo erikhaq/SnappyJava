@@ -163,6 +163,11 @@ public class ErrorHandler extends BaseErrorListener {
     setErrorDetected();
   }
 
+  public static void noMainMethod(Token tkn) {
+    System.err.printf("Error:(%d, %d) java: Main-method not named 'main'.", tkn.getLine(), tkn.getCharPositionInLine());
+    setErrorDetected();
+  }
+
   public static void cyclicInheritance(Token classIdToken, String classId) {
     // Error:(211, 1) java: cyclic inheritance involving se.ludrik.snappyj.TestCircle
     System.err.printf("Error:(%d, %d) java: cyclic inheritance involving %s\n", classIdToken.getLine(), classIdToken.getCharPositionInLine(), classId);

@@ -2,14 +2,14 @@ class hej {
   public static void main(String[] args) {
     // A a;
     // B b;
-    boolean a;
+    int a;
     int b;
-    a = true;
+    a = 1;
     b = 4;
     if(a == b) {
       System.out.println(1);
     } else {
-      System.out.println(0);
+      System.out.println(false);
     }
   }
 }

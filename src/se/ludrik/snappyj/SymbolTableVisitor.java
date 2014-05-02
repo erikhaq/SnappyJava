@@ -88,7 +88,12 @@ public class SymbolTableVisitor extends SnappyJavaBaseVisitor {
 
   @Override public Object visitMainClass(@NotNull SnappyJavaParser.MainClassContext ctx) {
     try {
-      currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(1).getText());
+
+      if(!ctx.ID(1).getText().equals("main")) {
+        ErrorHandler.noMainMethod(ctx.ID(1).getSymbol());
+      }
+
+      currentClass = symbolTable.addMainClass(ctx.ID(0).getText(), ctx.ID(2).getText());
       currentMethod = currentClass.methods.get("main");
     } catch (NullPointerException e) {}
 
