@@ -64,6 +64,3 @@ public class JVMMain {
     System.err.println();
   }
 }
-
-
-class M {}

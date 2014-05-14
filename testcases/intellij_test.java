@@ -1,4 +1,23 @@
-class hej {
+class Main {
+    public static void main(String[] args) {
+        Test t;
+        t = new Test();
+        System.out.println(t.test(10));
+    }
+}
+class Test {
+    public int test(int d) {
+        return d * d;
+    }
+}
+
+
+
+
+
+
+
+/*class hej {
   public static void main(String[] args) {
     // A a;
     // B b;

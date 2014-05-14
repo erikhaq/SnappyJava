@@ -58,7 +58,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       sb.append(".s");
 
       jasminWriter = new BufferedWriter(new FileWriter(sb.toString()));
-      jasminWriter.write(";\n; Output created by SnappyJava (mailto: snappy@java.se)\n;\n\n");
+      jasminWriter.write(";\n; Output created by SnappyJava (mailto: erikhaq@kth.se, ludwigpe@kth.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
       jasminWriter.write(".class\t" + "'" + className + "'" + "\n");
       if(currentClass.extendedClass != null) {

@@ -98,8 +98,6 @@ NEW         : 'new';
 LENGTH      : 'length';
 TRUE        : 'true';
 FALSE       : 'false';
-// MAIN        : 'main';
-// MAIN        : PUBLIC WS+ STATIC WS+ VOID WS+ 'main';
 
 // Separators
 LPAREN      : '(';
