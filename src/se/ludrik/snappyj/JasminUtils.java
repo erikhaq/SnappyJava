@@ -19,7 +19,6 @@ public class JasminUtils {
     return l;
   }
 
-
   public static String getFieldString(String id, SnappyType type) {
     StringBuilder sb = new StringBuilder();
     sb.append(".field '");
@@ -58,6 +57,7 @@ public class JasminUtils {
 
     return sb.toString();
   }
+
   public static String getClosingMethodDeclaration(SnappyType returnType) {
     StringBuilder sb = new StringBuilder();
     sb.append(")");
@@ -77,14 +77,17 @@ public class JasminUtils {
     sb.append("\n");
 
     return sb.toString();
-
   }
+
   public static String getJasminType(SnappyType type) {
     StringBuilder sb = new StringBuilder();
-    if(type.equals(SnappyType.INT_TYPE)) sb.append("I");
-    else if(type.equals(SnappyType.INT_ARRAY_TYPE)) sb.append("[I");
-    else if(type.equals(SnappyType.BOOL_TYPE)) sb.append("I");
-    else  {
+    if (type.equals(SnappyType.INT_TYPE)) {
+      sb.append("I");
+    } else if (type.equals(SnappyType.INT_ARRAY_TYPE)) {
+      sb.append("[I");
+    } else if (type.equals(SnappyType.BOOL_TYPE)) {
+      sb.append("I");
+    } else {
       sb.append("L");
       sb.append(type.type);
       sb.append(";");
@@ -95,10 +98,9 @@ public class JasminUtils {
   public static String getReturnString(SnappyType returnType) {
     StringBuilder sb = new StringBuilder();
     sb.append("\t");
-    if(returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE)) {
+    if (returnType.equals(SnappyType.INT_TYPE) || returnType.equals(SnappyType.BOOL_TYPE)) {
       sb.append("ireturn ");
-    }
-    else {
+    } else {
       sb.append("areturn ");
     }
     sb.append("\n");
@@ -107,15 +109,17 @@ public class JasminUtils {
 
   public static String getStoreString(SnappyVariable var, String className) {
     StringBuilder sb = new StringBuilder();
-    if(var.isField) {
+    if (var.isField) {
       /** return the string putfield Classname/fieldname fieldType */
       sb.append(getPutfieldString(var, className));
-    }
-    else {
+    } else {
       sb.append("\t");
       /** if type is int or bool do an istore else we store an object reference*/
-      if(var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) sb.append("istore ");
-      else sb.append("astore ");
+      if (var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) {
+        sb.append("istore ");
+      } else {
+        sb.append("astore ");
+      }
       sb.append(var.variableNumber);
       sb.append("\n");
     }
@@ -174,7 +178,6 @@ public class JasminUtils {
     return sb.toString();
   }
 
-
   public static String getInvokevirtualString(SnappyMethod method, String className) {
     StringBuilder sb = new StringBuilder();
     sb.append("\t");
@@ -183,7 +186,7 @@ public class JasminUtils {
     sb.append("/");
     sb.append(method.id);
     sb.append("(");
-    for(SnappyVariable param : method.parameters.values()) {
+    for (SnappyVariable param : method.parameters.values()) {
       sb.append(getJasminType(param.type));
     }
     sb.append(")");
@@ -193,15 +196,14 @@ public class JasminUtils {
     return sb.toString();
   }
 
-
   public static String getComparatorString(String comparator) {
     String label1 = getLabel(), label2 = getLabel();
     StringBuilder sb = new StringBuilder();
-    if(comparator.equals("<")) {
+    if (comparator.equals("<")) {
       sb.append("\tif_icmplt ");
-    } else if(comparator.equals("<=")) {
+    } else if (comparator.equals("<=")) {
       sb.append("\tif_icmple ");
-    } else if(comparator.equals(">")) {
+    } else if (comparator.equals(">")) {
       sb.append("\tif_icmpgt ");
     } else { //comparator.equals(">=")
       sb.append("\tif_icmpge ");
@@ -219,5 +221,4 @@ public class JasminUtils {
     sb.append(":\n");
     return sb.toString();
   }
-
 }

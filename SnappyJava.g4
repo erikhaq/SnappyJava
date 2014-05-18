@@ -52,17 +52,6 @@ expr
   | THIS                                  # ThisExp
   ;
 
-op
-  : '&&'
-  | '<='
-  | '>='
-  | '<'
-  | '>'
-  | '*'
-  | '+'
-  | '-'
-  ;
-
 exprList
   : expr (exprRest)*
   |

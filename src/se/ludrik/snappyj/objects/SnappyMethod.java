@@ -10,7 +10,7 @@ public class SnappyMethod {
   public Map<String, SnappyVariable> parameters;
   public Map<String, SnappyVariable> variables;
   public SnappyType returnType;
-  public int LOCAL_NUM = 1;
+  public int numOfLocals = 1;
   private int stackSize = 1;
 
   public SnappyMethod(String methodId) {
@@ -22,23 +22,21 @@ public class SnappyMethod {
 
   public void addParameter(SnappyVariable param) {
     parameters.put(param.id, param);
-    param.variableNumber = LOCAL_NUM;
-    LOCAL_NUM++;
-
+    param.variableNumber = numOfLocals;
+    numOfLocals++;
   }
 
   public void addParameter(String type, String id) {
     SnappyVariable param = new SnappyVariable(id, type);
-    param.variableNumber = LOCAL_NUM;
-    LOCAL_NUM++;
+    param.variableNumber = numOfLocals;
+    numOfLocals++;
     parameters.put(id, param);
-
   }
 
   public void addVariable(String type, String id) {
     SnappyVariable var = new SnappyVariable(id, type);
-    var.variableNumber = LOCAL_NUM;
-    LOCAL_NUM++;
+    var.variableNumber = numOfLocals;
+    numOfLocals++;
     variables.put(id, var);
   }
 
@@ -50,17 +48,17 @@ public class SnappyMethod {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("\nMethod " + id + "\nParameters: (");
-    for(SnappyVariable param : parameters.values()) {
+    for (SnappyVariable param : parameters.values()) {
       sb.append(param);
       sb.append(", ");
     }
-    sb = parameters.size() > 0 ? sb.replace(sb.length()-2, sb.length(), ")") : sb.append(" )");
+    sb = parameters.size() > 0 ? sb.replace(sb.length() - 2, sb.length(), ")") : sb.append(" )");
     sb.append("\nVariables: (");
-    for(SnappyVariable variable : variables.values()) {
+    for (SnappyVariable variable : variables.values()) {
       sb.append(variable);
       sb.append(", ");
     }
-    sb = variables.size() > 0 ? sb.replace(sb.length()-2, sb.length(), ")") : sb.append(" )");
+    sb = variables.size() > 0 ? sb.replace(sb.length() - 2, sb.length(), ")") : sb.append(" )");
     sb.append("\nReturn type: " + returnType);
     return sb.toString();
   }

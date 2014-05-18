@@ -8,6 +8,7 @@ public class SnappyVariable {
   public String id;
   public int variableNumber = 0;
   public boolean isField = false;
+
   public SnappyVariable(String variableId, String type) {
     id = variableId;
     this.type = new SnappyType(type);

@@ -108,7 +108,7 @@ if [ $filename == "tests" ]; then
 
   ## Testing files that should fail to compile
   echo -e "\n------------------------------------"
-  echo -e "Compiling non-compilable test cases.\n"
+  echo -e "Compiling non-compilable test cases."
   echo -e "------------------------------------\n"
   for f in $noncompile_files; do
     echo -ne "Compiling $f "

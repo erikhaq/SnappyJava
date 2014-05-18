@@ -38,7 +38,7 @@ public class SnappyClass {
 
   public SnappyVariable getVariable(String varName) {
     SnappyVariable v = fields.get(varName);
-    if(v == null && extendedClass != null) {
+    if (v == null && extendedClass != null) {
       // Try recursively to find variable in superclasses
       v = extendedClass.getVariable(varName);
     }
@@ -47,7 +47,7 @@ public class SnappyClass {
 
   public SnappyMethod getMethod(String methodName) {
     SnappyMethod m = methods.get(methodName);
-    if(m == null && extendedClass != null) {
+    if (m == null && extendedClass != null) {
       // Try recursively to find method in superclasses
       m = extendedClass.getMethod(methodName);
     }
@@ -55,9 +55,9 @@ public class SnappyClass {
   }
 
   public boolean hasMethod(String methodName) {
-    if(methods.containsKey(methodName)) {
+    if (methods.containsKey(methodName)) {
       return true;
-    } else if(extendedClass != null && extendedClass.hasMethod(methodName)) {
+    } else if (extendedClass != null && extendedClass.hasMethod(methodName)) {
       return true;
     } else {
       return false;
@@ -68,16 +68,16 @@ public class SnappyClass {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("Class " + id);
-    if(extendedClass != null) {
+    if (extendedClass != null) {
       sb.append(" extends " + extendedClass);
     }
     sb.append("\nFields: (");
-    for(SnappyVariable field : fields.values()) {
+    for (SnappyVariable field : fields.values()) {
       sb.append(field);
       sb.append(", ");
     }
-    sb = fields.size() > 0 ? sb.replace(sb.length()-2, sb.length(), ")") : sb.append(" )");
-    for(SnappyMethod method : methods.values()) {
+    sb = fields.size() > 0 ? sb.replace(sb.length() - 2, sb.length(), ")") : sb.append(" )");
+    for (SnappyMethod method : methods.values()) {
       sb.append(method);
       sb.append("\n");
     }

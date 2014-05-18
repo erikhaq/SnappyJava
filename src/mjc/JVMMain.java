@@ -13,30 +13,23 @@ public class JVMMain {
   public static String outputDirectory = ".";
 
   public static void main(String[] args) {
-    //printArgs(args);
-
     String filePath;
     if(args.length > 0) {
       filePath = args[0];
-      //if(readOption("-m", args) > 0) printErrors = false;
       if(readOption("-S", args) > 0) generateJvmCode = true;
       int oIndex = readOption("-o", args);
       if(oIndex > 0) outputDirectory = readStringArg(oIndex, args);
     } else {
       System.err.println("Please specify a filename");
-      //System.err.println("Using default file.");
-      //filePath = "student-tests-2014/execute/2014G06/ExtendMainManyEquals.java";
       System.exit(1);
       return;
     }
-
     try {
       Main snappyJava = new Main(filePath);
       snappyJava.init();
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
   public static String readStringArg(int index, String[] args) {

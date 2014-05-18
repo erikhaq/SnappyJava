@@ -13,6 +13,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   SymbolTable symbolTable;
   SnappyClass currentClass;
   SnappyMethod currentMethod;
+
   public StackCountVisitor(SymbolTable symbolTable) {
     this.symbolTable = symbolTable;
   }
@@ -22,7 +23,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
     currentClass = symbolTable.classes.get(ctx.ID(0).getText());
     currentMethod = currentClass.methods.get("main");
     int maxStackSize = 0;
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       maxStackSize = Math.max(maxStackSize, stmt.accept(this));
     }
     currentMethod.setStackSize(maxStackSize);
@@ -34,7 +35,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   @Override
   public Integer visitClassDecl(@NotNull SnappyJavaParser.ClassDeclContext ctx) {
     currentClass = symbolTable.classes.get(ctx.ID().getText());
-    for(SnappyJavaParser.MethodDeclContext method : ctx.methodDecl()) {
+    for (SnappyJavaParser.MethodDeclContext method : ctx.methodDecl()) {
       method.accept(this);
     }
     currentClass = null;
@@ -45,7 +46,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   public Integer visitMethodDecl(@NotNull SnappyJavaParser.MethodDeclContext ctx) {
     currentMethod = currentClass.methods.get(ctx.ID().getText());
     int maxStackSize = 0;
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       maxStackSize = Math.max(maxStackSize, stmt.accept(this));
     }
     maxStackSize = Math.max(maxStackSize, ctx.expr().accept(this));
@@ -57,7 +58,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   @Override
   public Integer visitBody(@NotNull SnappyJavaParser.BodyContext ctx) {
     int maxStackSize = 0;
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       maxStackSize = Math.max(maxStackSize, stmt.accept(this));
     }
     return maxStackSize;
@@ -65,7 +66,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
 
   @Override public Integer visitIf(@NotNull SnappyJavaParser.IfContext ctx) {
     int maxStackSize = 0;
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       maxStackSize = Math.max(maxStackSize, stmt.accept(this));
     }
     maxStackSize = Math.max(ctx.expr().accept(this), maxStackSize);
@@ -86,12 +87,13 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   @Override public Integer visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
     int isField = 0;
     String varName = ctx.ID().getText();
-    if(currentClass.fields.containsKey(varName)) isField = 1;
+    if (currentClass.fields.containsKey(varName)) isField = 1;
     return ctx.expr().accept(this) + isField;
   }
 
   @Override public Integer visitArrayAssign(@NotNull SnappyJavaParser.ArrayAssignContext ctx) {
-    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1) + 1; //+1 for array obj. ref.
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1)
+        + 1; //+1 for array obj. ref.
   }
 
   @Override public Integer visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
@@ -103,7 +105,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   }
 
   @Override public Integer visitCallExp(@NotNull SnappyJavaParser.CallExpContext ctx) {
-    return Math.max(ctx.expr().accept(this), ctx.exprList().accept(this)+1);
+    return Math.max(ctx.expr().accept(this), ctx.exprList().accept(this) + 1);
   }
 
   @Override public Integer visitExprList(@NotNull SnappyJavaParser.ExprListContext ctx) {
@@ -113,7 +115,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
       maxStackSize = ctx.expr().accept(this);
     }
 
-    for(SnappyJavaParser.ExprRestContext exprRest : ctx.exprRest()) {
+    for (SnappyJavaParser.ExprRestContext exprRest : ctx.exprRest()) {
       maxStackSize = Math.max(maxStackSize, exprRest.expr().accept(this) + paramCount++);
     }
     return maxStackSize;
@@ -127,7 +129,8 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
     return ctx.expr().accept(this) + 1; //+1 for the '!'
   }
 
-  @Override public Integer visitNewIntArrayExp(@NotNull SnappyJavaParser.NewIntArrayExpContext ctx) {
+  @Override public Integer visitNewIntArrayExp(
+      @NotNull SnappyJavaParser.NewIntArrayExpContext ctx) {
     return ctx.expr().accept(this);
   }
 
@@ -136,7 +139,7 @@ public class StackCountVisitor extends SnappyJavaBaseVisitor<Integer> {
   }
 
   @Override public Integer visitMultiOp(@NotNull SnappyJavaParser.MultiOpContext ctx) {
-    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this)+1); //+1 for right side
+    return Math.max(ctx.expr(0).accept(this), ctx.expr(1).accept(this) + 1); //+1 for right side
   }
 
   @Override public Integer visitAddSubOp(@NotNull SnappyJavaParser.AddSubOpContext ctx) {

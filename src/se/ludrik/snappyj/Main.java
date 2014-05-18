@@ -50,10 +50,9 @@ public class Main {
     stackCount(symTable);
 
     // Generate JVM code
-    if(JVMMain.generateJvmCode) {
+    if (JVMMain.generateJvmCode) {
       generateJVM(symTable);
     }
-
   }
 
   private SymbolTable buildSymboltable() {
@@ -80,13 +79,11 @@ public class Main {
     codeGenVisitor.visit(tree);
     codeGenVisitor.closeWriter();
     exitIfError();
-
   }
 
   private void exitIfError() {
-    if(ErrorHandler.getErrorDetected()) {
+    if (ErrorHandler.getErrorDetected()) {
       System.exit(1);
     }
   }
-
 }

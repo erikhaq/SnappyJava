@@ -19,6 +19,7 @@ out/
 output/
 
 # Misc files #
-ludwig_test.java
-test2.java
 student-tests-2014/
+testcases/
+newtestcases/
+gen/

@@ -6,7 +6,6 @@ import se.ludrik.snappyj.objects.*;
 
 /**
  * Symbol table class.
- *
  */
 public class SymbolTable {
 
@@ -60,10 +59,9 @@ public class SymbolTable {
   public SnappyType getExtendedType(String classId) {
     SnappyType type = null;
     SnappyClass subClass = getClass(classId);
-    if(subClass != null && subClass.extendedClass != null) {
+    if (subClass != null && subClass.extendedClass != null) {
       type = new SnappyType(subClass.extendedClass.id);
     }
     return type;
   }
-
 }

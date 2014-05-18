@@ -8,29 +8,31 @@ import java.util.List;
 import se.ludrik.snappyj.antlr.*;
 import se.ludrik.snappyj.antlr.SnappyJavaParser.*;
 
-public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
+public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType> {
   SnappyClass currentClass;
   SnappyMethod currentMethod;
   SymbolTable symbolTable;
-  List<String> boolOperators = Arrays.asList("&&", "<",">", "<=", ">=");
+  List<String> boolOperators = Arrays.asList("&&", "<", ">", "<=", ">=");
   List<String> intOperators = Arrays.asList("*", "+", "-");
+
   public TypeCheckVisitor(SymbolTable table) {
     symbolTable = table;
-
   }
+
   public boolean isValidType(String type) {
-    if(SnappyType.reservedTypes.contains(type)) return true;
-    if(symbolTable.classes.containsKey(type)) return true;
+    if (SnappyType.reservedTypes.contains(type)) return true;
+    if (symbolTable.classes.containsKey(type)) return true;
     return false;
   }
+
   public SnappyVariable getVariable(String var) {
     // Try to get var from fields. If it does not exist it will return null
     SnappyVariable v = currentClass.getVariable(var);
-    if(currentMethod != null) {
+    if (currentMethod != null) {
       // check if variable is bound harder for method
-      if(currentMethod.parameters.containsKey(var)) {
+      if (currentMethod.parameters.containsKey(var)) {
         v = currentMethod.parameters.get(var);
-      } else if(currentMethod.variables.containsKey(var)) {
+      } else if (currentMethod.variables.containsKey(var)) {
         v = currentMethod.variables.get(var);
       }
     }
@@ -39,19 +41,18 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   }
 
   public boolean isCompatibleTypes(SnappyType left, SnappyType right) {
-    if(left.equals(right)) {
+    if (left.equals(right)) {
       return true;
     }
 
     // Check if right side is an instance of a class that extends left side (implicit casting)
     SnappyType newRight = symbolTable.getExtendedType(right.type);
-    if(newRight != null) {
+    if (newRight != null) {
       return isCompatibleTypes(left, newRight);
     } else {
       return false;
     }
   }
-
 
   @Override
   public SnappyType visitMainClass(@NotNull MainClassContext ctx) {
@@ -61,7 +62,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
 
@@ -78,13 +79,11 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
-    for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
+    for (SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
       m.accept(this);
     }
     currentClass = null;
     return new SnappyType(classId);
-
-
   }
 
   @Override
@@ -92,8 +91,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     String varName = ctx.ID().getText();
     SnappyType varType = null;
 
-
-    if(currentMethod != null) {
+    if (currentMethod != null) {
       // declaration is a variable
       varType = currentMethod.variables.get(varName).type;
     } else {
@@ -101,15 +99,13 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
       varType = currentClass.fields.get(varName).type;
     }
 
-    if(!isValidType(varType.toString())) {
+    if (!isValidType(varType.toString())) {
       // send error message here for no such symbol
       ErrorHandler.missingClassSymbol(ctx.type().getStart(), currentClass.id);
     }
 
     return varType;
-
   }
-
 
   @Override
   public SnappyType visitMethodDecl(@NotNull MethodDeclContext ctx) {
@@ -117,28 +113,32 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     currentMethod = currentClass.methods.get(methodId);
     SnappyType returnType = currentMethod.returnType;
 
-    if(!isValidType(returnType.toString())) {
+    if (!isValidType(returnType.toString())) {
       ErrorHandler.missingClassSymbol(ctx.type().getStart(), currentClass.id);
-
     }
+
     //Visit formalList
     ctx.formalList().accept(this);
+
     //vist varDeclarations
-    for(SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
+    for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
       v.accept(this);
     }
+
     // visit statmenets
-    for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
+
     //visit return expression
     SnappyType returnExpr = ctx.expr().accept(this);
 
-    if(!isCompatibleTypes(returnType, returnExpr)) {
+    if (!isCompatibleTypes(returnType, returnExpr)) {
       // the return expression is not same as return type
-      ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(), returnExpr.toString());
-
+      ErrorHandler.incompatibleTypes(ctx.type().getStart(), returnType.toString(),
+          returnExpr.toString());
     }
+
     //check return expression is same as return type
     currentMethod = null;
     return returnType;
@@ -146,14 +146,14 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitFormalList(@NotNull FormalListContext ctx) {
-    if(ctx.getChildCount() > 0) {
+    if (ctx.getChildCount() > 0) {
       String paramType = ctx.type().getText();
 
-      if(!isValidType(paramType)) {
+      if (!isValidType(paramType)) {
         ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
       }
 
-      for(FormalRestContext formalRestContext : ctx.formalRest()) {
+      for (FormalRestContext formalRestContext : ctx.formalRest()) {
         formalRestContext.accept(this);
       }
     }
@@ -164,19 +164,19 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitFormalRest(@NotNull FormalRestContext ctx) {
     String paramType = ctx.type().getText();
-    if(!isValidType(paramType)) {
+    if (!isValidType(paramType)) {
       ErrorHandler.missingClassSymbol(ctx.type().ID().getSymbol(), currentClass.id);
     }
     return null;
   }
+
   @Override
   public SnappyType visitType(@NotNull TypeContext ctx) {
     String type = ctx.getText();
-    if(!isValidType(type)) {
+    if (!isValidType(type)) {
       //ERROR: No such type
-      System.err.printf("Error:(%d, %d) java: no such type exists: %s\n",
-              ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
-
+      System.err.printf("Error:(%d, %d) java: no such type exists: %s\n", ctx.getStart().getLine(),
+          ctx.getStart().getCharPositionInLine(), type);
     }
     return new SnappyType(type);
   }
@@ -185,36 +185,41 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitBody(@NotNull BodyContext ctx) {
-    for(StmtContext stmt : ctx.stmt()) {
+    for (StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
     return null;
   }
+
   @Override
   public SnappyType visitIf(@NotNull IfContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.BOOL_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type);
+    if (!exprType.equals(SnappyType.BOOL_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type,
+          exprType.type);
     }
-    for(StmtContext stmt : ctx.stmt()) {
+    for (StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
 
     return null;
   }
+
   @Override
   public SnappyType visitWhile(@NotNull WhileContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.BOOL_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type);
+    if (!exprType.equals(SnappyType.BOOL_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type,
+          exprType.type);
     }
     ctx.stmt().accept(this);
     return null;
   }
+
   @Override
   public SnappyType visitSout(@NotNull SoutContext ctx) {
     SnappyType inner = ctx.expr().accept(this);
-    if(!inner.equals(SnappyType.INT_TYPE) && !inner.equals(SnappyType.BOOL_TYPE)) {
+    if (!inner.equals(SnappyType.INT_TYPE) && !inner.equals(SnappyType.BOOL_TYPE)) {
       ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, inner.type);
     }
     return null;
@@ -225,13 +230,12 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyVariable left = getVariable(ctx.ID().getText());
     SnappyType rightExp = ctx.expr().accept(this);
 
-    if(left == null) {
+    if (left == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
-    } else if(!isCompatibleTypes(left.type, rightExp)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), left.type.toString(), rightExp.type );
+    } else if (!isCompatibleTypes(left.type, rightExp)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), left.type.toString(), rightExp.type);
     }
     return null;
-
   }
 
   @Override
@@ -240,30 +244,34 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     SnappyType innerExp = ctx.expr(0).accept(this);
     SnappyType assingExp = ctx.expr(1).accept(this);
 
-    if(id == null) {
+    if (id == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
-    } else if(!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
+    } else if (!id.type.equals(SnappyType.INT_ARRAY_TYPE)) {
       // the left hand side identifier is not of type INT_ARRAY!
-      ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), SnappyType.INT_ARRAY_TYPE.type, id.type.toString());
+      ErrorHandler.incompatibleTypes(ctx.ID().getSymbol(), SnappyType.INT_ARRAY_TYPE.type,
+          id.type.toString());
     }
     // check that inner expression is of type INT_TYPE
-    if(!innerExp.equals(SnappyType.INT_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_TYPE.type, innerExp.type);
+    if (!innerExp.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_TYPE.type,
+          innerExp.type);
     }
     // check that the right hand side is of type INT_TYPE
-    if(!assingExp.equals(SnappyType.INT_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type, assingExp.type);
+    if (!assingExp.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type,
+          assingExp.type);
     }
     return null;
   }
- /* ------------------------------------- Expressions ---------------------------------------------- */
+
+  /* ------------------------------------- Expressions ---------------------------------------------- */
   public void doOpCheck(ExprContext leftCtx, ExprContext rightCtx, SnappyType opType) {
     SnappyType leftType = leftCtx.accept(this);
     SnappyType rightType = rightCtx.accept(this);
-    if(!leftType.equals(opType)) {
+    if (!leftType.equals(opType)) {
       ErrorHandler.incompatibleTypes(leftCtx.getStart(), opType.type, leftType.type);
     }
-    if(!rightType.equals(opType)) {
+    if (!rightType.equals(opType)) {
       ErrorHandler.incompatibleTypes(rightCtx.getStart(), opType.type, rightType.type);
     }
   }
@@ -303,7 +311,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override public SnappyType visitCEQComp(@NotNull CEQCompContext ctx) {
     SnappyType leftType = ctx.expr(0).accept(this);
     SnappyType rightType = ctx.expr(1).accept(this);
-    if(!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
+    if (!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
       ErrorHandler.incompatibleTypes(ctx.getStart(), leftType.type, rightType.type);
     }
     return SnappyType.BOOL_TYPE;
@@ -312,7 +320,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override public SnappyType visitCNEComp(@NotNull CNECompContext ctx) {
     SnappyType leftType = ctx.expr(0).accept(this);
     SnappyType rightType = ctx.expr(1).accept(this);
-    if(!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
+    if (!isCompatibleTypes(leftType, rightType) && !isCompatibleTypes(rightType, leftType)) {
       ErrorHandler.incompatibleTypes(ctx.getStart(), leftType.type, rightType.type);
     }
     return SnappyType.BOOL_TYPE;
@@ -324,19 +332,21 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     // get type of the left expression
     SnappyType leftType = ctx.expr(0).accept(this);
     SnappyType innerType = ctx.expr(1).accept(this);
-    if(ctx.expr(0) instanceof NewIntArrayExpContext) {
+    if (ctx.expr(0) instanceof NewIntArrayExpContext) {
       ErrorHandler.cantCreateMultiDimensional(ctx.getStart(), ctx.getText(), currentMethod.id);
     }
 
-    if(!leftType.equals(SnappyType.INT_ARRAY_TYPE)) {
+    if (!leftType.equals(SnappyType.INT_ARRAY_TYPE)) {
       // ERROR, Left type must be of INT_ARRAY
       System.err.println("Left type must be of type int[]");
-      ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_ARRAY_TYPE.type, leftType.type);
+      ErrorHandler.incompatibleTypes(ctx.expr(0).getStart(), SnappyType.INT_ARRAY_TYPE.type,
+          leftType.type);
     }
-    if(!innerType.equals(SnappyType.INT_TYPE)){
+    if (!innerType.equals(SnappyType.INT_TYPE)) {
       // ERROR, Inner must be of INT type
       System.err.println("inner type must be of type int");
-      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type, innerType.type);
+      ErrorHandler.incompatibleTypes(ctx.expr(1).getStart(), SnappyType.INT_TYPE.type,
+          innerType.type);
     }
     return returnType;
   }
@@ -344,7 +354,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitLengthExp(@NotNull LengthExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
+    if (!exprType.equals(SnappyType.INT_ARRAY_TYPE)) {
       ErrorHandler.notAStatement(ctx.getStart());
     }
     return SnappyType.INT_TYPE;
@@ -357,12 +367,12 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     ArrayList<String> requiredParamTypes = new ArrayList<String>();
     ArrayList<String> foundParamTypes = new ArrayList<String>();
     boolean foundError = false;
-    if(classType == null) {
+    if (classType == null) {
       ErrorHandler.missingClassSymbol(ctx.expr().getStart(), currentMethod.id);
-    } else if(symbolTable.classes.containsKey(classType.type)) {
+    } else if (symbolTable.classes.containsKey(classType.type)) {
       SnappyClass leftClass = symbolTable.classes.get(classType.type);
       String methodName = ctx.ID().getText();
-      if(!leftClass.hasMethod(methodName)) {
+      if (!leftClass.hasMethod(methodName)) {
 
         ErrorHandler.noSuchMethod(ctx.ID().getSymbol(), classType.type);
       } else {
@@ -373,16 +383,18 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
         // First check that number of parameters defined in method is same as inserted in current method call
         // Also don't enter block if there are no parameters to check.
 
-        if(method.parameters.size() == ctx.exprList().getChildCount() && method.parameters.size() > 0) {
+        if (method.parameters.size() == ctx.exprList().getChildCount()
+            && method.parameters.size() > 0) {
           // Get all declared parameters from method
-          ArrayList<SnappyVariable> declaredParams = new ArrayList<SnappyVariable>(method.parameters.values());
+          ArrayList<SnappyVariable> declaredParams =
+              new ArrayList<SnappyVariable>(method.parameters.values());
           // get first input type and first declared type
           SnappyType currInputType = ctx.exprList().expr().accept(this);
           SnappyType currDeclType = declaredParams.get(0).type;
           requiredParamTypes.add(currDeclType.type);
           foundParamTypes.add(currInputType.type);
           // check that they are of the same type
-          if(!isCompatibleTypes(currDeclType, currInputType)) {
+          if (!isCompatibleTypes(currDeclType, currInputType)) {
             // invalid method parameters
             foundError = true;
           }
@@ -390,31 +402,30 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
           List<ExprRestContext> inputParams = ctx.exprList().exprRest();
 
           // loop through all input parameters and check that they are of same type as defined for current method.
-          for(int i = 0; i < inputParams.size(); i++) {
+          for (int i = 0; i < inputParams.size(); i++) {
             currInputType = inputParams.get(i).accept(this);
-            currDeclType = declaredParams.get(i+1).type;
+            currDeclType = declaredParams.get(i + 1).type;
             requiredParamTypes.add(currDeclType.type);
             foundParamTypes.add(currInputType.type);
-            if(!isCompatibleTypes(currDeclType, currInputType)) {
+            if (!isCompatibleTypes(currDeclType, currInputType)) {
               // invalid method parameters
               foundError = true;
             }
           }
 
-          if(foundError) {
+          if (foundError) {
             ErrorHandler.invalidMethodParams(ctx.ID().getSymbol(), classType.type,
                 requiredParamTypes.toString(), foundParamTypes.toString());
           }
         } else {
-          if(method.parameters.size() != ctx.exprList().getChildCount()) {
-           ErrorHandler.invalidMethodParamSize(ctx.ID().getSymbol(), classType.type);
+          if (method.parameters.size() != ctx.exprList().getChildCount()) {
+            ErrorHandler.invalidMethodParamSize(ctx.ID().getSymbol(), classType.type);
           }
         }
       }
     }
     return returnType;
   }
-
 
   @Override
   public SnappyType visitNumExp(@NotNull NumExpContext ctx) {
@@ -425,7 +436,6 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     } finally {
       return SnappyType.INT_TYPE;
     }
-
   }
 
   @Override
@@ -438,7 +448,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
     String varName = ctx.ID().getText();
     SnappyType returnType = new SnappyType(varName);
     SnappyVariable var = getVariable(varName);
-    if(var == null) {
+    if (var == null) {
       ErrorHandler.missingVariableSymbol(ctx.ID().getSymbol(), currentMethod.id);
     } else {
       returnType = var.type;
@@ -448,7 +458,7 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
 
   @Override
   public SnappyType visitThisExp(@NotNull ThisExpContext ctx) {
-    if(currentClass.id.equals(symbolTable.mainClass.id)) {
+    if (currentClass.id.equals(symbolTable.mainClass.id)) {
       ErrorHandler.cantCallThisFromStaticContext(ctx.getStart());
     }
     return new SnappyType(currentClass.id);
@@ -457,49 +467,36 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   @Override
   public SnappyType visitNewIntArrayExp(@NotNull NewIntArrayExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.INT_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type, exprType.type);
+    if (!exprType.equals(SnappyType.INT_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.INT_TYPE.type,
+          exprType.type);
     }
     return SnappyType.INT_ARRAY_TYPE;
   }
-
 
   @Override
   public SnappyType visitNewIdExp(@NotNull NewIdExpContext ctx) {
     String className = ctx.ID().getText();
     SnappyType returnType = new SnappyType(className);
-    if(!symbolTable.classes.containsKey(className)) {
+    if (!symbolTable.classes.containsKey(className)) {
       ErrorHandler.missingClassSymbol(ctx.ID().getSymbol(), currentMethod.id);
     }
     return returnType;
   }
 
-
   @Override
   public SnappyType visitNotExp(@NotNull NotExpContext ctx) {
     SnappyType exprType = ctx.expr().accept(this);
-    if(!exprType.equals(SnappyType.BOOL_TYPE)) {
-      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type, exprType.type );
+    if (!exprType.equals(SnappyType.BOOL_TYPE)) {
+      ErrorHandler.incompatibleTypes(ctx.expr().getStart(), SnappyType.BOOL_TYPE.type,
+          exprType.type);
     }
     return SnappyType.BOOL_TYPE;
   }
 
-
   @Override
   public SnappyType visitParenExp(@NotNull ParenExpContext ctx) {
     return ctx.expr().accept(this);
-  }
-  /* ------------------------------------------------ OPERATORS -------------------------------------------- */
-  @Override
-  public SnappyType visitOp(@NotNull OpContext ctx) {
-    SnappyType returnType = null;
-    String operator = ctx.getText();
-    if(boolOperators.contains(operator)) {
-      returnType = SnappyType.BOOL_TYPE;
-    } else if(intOperators.contains(operator)) {
-      returnType = SnappyType.INT_TYPE;
-    }
-    return returnType;
   }
 
   /* ---------------------------------------- Expression List ----------------------------------------------*/
@@ -508,5 +505,4 @@ public class TypeCheckVisitor extends SnappyJavaBaseVisitor<SnappyType>{
   public SnappyType visitExprRest(@NotNull ExprRestContext ctx) {
     return ctx.expr().accept(this);
   }
-
 }

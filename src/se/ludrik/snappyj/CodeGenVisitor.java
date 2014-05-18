@@ -1,6 +1,5 @@
 package se.ludrik.snappyj;
 
-import java.io.File;
 import java.io.IOException;
 import mjc.JVMMain;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -8,7 +7,6 @@ import se.ludrik.snappyj.antlr.*;
 import se.ludrik.snappyj.objects.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-
 
 /**
  * JVM Code generator class
@@ -19,10 +17,10 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   SnappyClass currentClass;
   SnappyMethod currentMethod;
   public String filePath;
+
   public CodeGenVisitor(SymbolTable symbolTable, String filePath) {
     this.symbolTable = symbolTable;
     this.filePath = filePath;
-
   }
 
   public void pushVariableToStack(String varName) {
@@ -34,7 +32,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         jasminWriter.write("\taload_0\n");
         jasminWriter.write(JasminUtils.getGetfieldString(var, currentClass.id));
       } else {
-        if(var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) {
+        if (var.type.equals(SnappyType.INT_TYPE) || var.type.equals(SnappyType.BOOL_TYPE)) {
           jasminWriter.write("\tiload " + var.variableNumber + "\n");
         } else {
           jasminWriter.write("\taload " + var.variableNumber + "\n");
@@ -43,11 +41,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
+
   public void newClass(String className) {
     try {
-      if(jasminWriter != null) {
+      if (jasminWriter != null) {
         jasminWriter.close();
       }
 
@@ -58,10 +56,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       sb.append(".s");
 
       jasminWriter = new BufferedWriter(new FileWriter(sb.toString()));
-      jasminWriter.write(";\n; Output created by SnappyJava (mailto: erikhaq@kth.se, ludwigpe@kth.se)\n;\n\n");
+      jasminWriter.write(
+          ";\n; Output created by SnappyJava (mailto: erikhaq@kth.se, ludwigpe@kth.se)\n;\n\n");
       jasminWriter.write(".source\t" + filePath + "\n");
       jasminWriter.write(".class\t" + "'" + className + "'" + "\n");
-      if(currentClass.extendedClass != null) {
+      if (currentClass.extendedClass != null) {
         jasminWriter.write(".super\t'" + currentClass.extendedClass.id + "'\n\n");
       } else {
         jasminWriter.write(".super\tjava/lang/Object" + "\n\n");
@@ -73,7 +72,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
   public void closeWriter() {
     try {
-      if(jasminWriter != null) {
+      if (jasminWriter != null) {
         jasminWriter.close();
       }
     } catch (IOException e) {
@@ -81,15 +80,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     }
   }
 
-
   public SnappyVariable getVariable(String var) {
     // Try to get var from fields. If it does not exist it will return null
     SnappyVariable v = currentClass.getVariable(var);
-    if(currentMethod != null) {
+    if (currentMethod != null) {
       // check if variable is bound harder for method
-      if(currentMethod.parameters.containsKey(var)) {
+      if (currentMethod.parameters.containsKey(var)) {
         v = currentMethod.parameters.get(var);
-      } else if(currentMethod.variables.containsKey(var)) {
+      } else if (currentMethod.variables.containsKey(var)) {
         v = currentMethod.variables.get(var);
       }
     }
@@ -109,23 +107,22 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
       jasminWriter.write(JasminUtils.getConstuctorString());
       jasminWriter.write(".method public static main([Ljava/lang/String;)V\n");
-      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM));
+      jasminWriter.write(
+          JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.numOfLocals));
 
       for (SnappyJavaParser.VarDeclContext v : ctx.varDecl()) {
         v.accept(this);
       }
-      for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+      for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
       }
 
       jasminWriter.write("\treturn\n.end method\n\n");
       currentMethod = null;
       currentClass = null;
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
 
     return null;
   }
@@ -142,7 +139,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     }
 
     String constructor;
-    if(currentClass.extendedClass != null) {
+    if (currentClass.extendedClass != null) {
       constructor = JasminUtils.getConstructorString(currentClass.extendedClass.id);
     } else {
       constructor = JasminUtils.getConstuctorString();
@@ -151,11 +148,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     try {
       jasminWriter.write(constructor);
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }
 
     /** Declare all methods */
-    for(SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
+    for (SnappyJavaParser.MethodDeclContext m : ctx.methodDecl()) {
       m.accept(this);
     }
     currentClass = null;
@@ -167,7 +164,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   public Object visitVarDecl(@NotNull SnappyJavaParser.VarDeclContext ctx) {
     String varName = ctx.ID().getText();
     SnappyVariable var;
-    if(currentMethod == null) {
+    if (currentMethod == null) {
       var = currentClass.fields.get(varName);
       /** write the text: .field <identifier><type> */
       String fieldString = JasminUtils.getFieldString(varName, var.type);
@@ -188,13 +185,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     try {
       jasminWriter.write(methodString);
       /** Write all paramters */
-      for(SnappyVariable v : currentMethod.parameters.values()) {
+      for (SnappyVariable v : currentMethod.parameters.values()) {
         jasminWriter.write(JasminUtils.getJasminType(v.type));
       }
       jasminWriter.write(JasminUtils.getClosingMethodDeclaration(currentMethod.returnType));
-      jasminWriter.write(JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.LOCAL_NUM));
+      jasminWriter.write(
+          JasminUtils.getMethodLimits(currentMethod.getStackSize(), currentMethod.numOfLocals));
 
-      for(SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
+      for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
         stmt.accept(this);
       }
 
@@ -202,10 +200,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       ctx.expr().accept(this);
       jasminWriter.write(JasminUtils.getReturnString(currentMethod.returnType));
       jasminWriter.write(".end method\n\n");
-
     } catch (IOException e) {
       e.printStackTrace();
-    }finally {
+    } finally {
       currentMethod = null;
       return null;
     }
@@ -217,14 +214,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
         ctx);    //To change body of overridden methods use File | Settings | File Templates.
   }
 
- /** ---------------------------------- Statements -------------------------------------------------------------- */
+  /** ---------------------------------- Statements -------------------------------------------------------------- */
 
- @Override
+  @Override
   public Object visitBody(@NotNull SnappyJavaParser.BodyContext ctx) {
-    for(SnappyJavaParser.StmtContext stmt: ctx.stmt()) {
+    for (SnappyJavaParser.StmtContext stmt : ctx.stmt()) {
       stmt.accept(this);
     }
-   return null;
+    return null;
   }
 
   @Override
@@ -242,13 +239,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** Visit the else statement*/
       ctx.stmt(1).accept(this);
       jasminWriter.write("\t" + doneLabel + ":\n");
-
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
-
   }
 
   @Override
@@ -270,14 +265,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\tgoto " + loopLabel + "\n");
       /** print doneLabel */
       jasminWriter.write("\t" + doneLabel + ":\n");
-
-
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
-
   }
 
   @Override
@@ -292,9 +284,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** Put the sout statement on the stack*/
       ctx.expr().accept(this);
       /** put the tostring method on the stack*/
-      if(exprType.equals(SnappyType.BOOL_TYPE)){
+      if (exprType.equals(SnappyType.BOOL_TYPE)) {
         jasminWriter.write("\tinvokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;\n");
-      } else if(exprType.equals(SnappyType.INT_TYPE)) {
+      } else if (exprType.equals(SnappyType.INT_TYPE)) {
         jasminWriter.write("\tinvokestatic java/lang/Integer/toString(I)Ljava/lang/String;\n");
       } else {
         jasminWriter.write("\tinvokevirtual java/lang/Object/toString()Ljava/lang/String;\n");
@@ -302,25 +294,20 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
       /** invoke println method on the string on the stack*/
       jasminWriter.write("\tinvokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n");
-
-
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
       return null;
     }
-
-
   }
 
   @Override
   public Object visitAssign(@NotNull SnappyJavaParser.AssignContext ctx) {
 
-
     /** get the left hand side variable*/
     SnappyVariable var = getVariable(ctx.ID().getText());
     try {
-      if(var.isField) {
+      if (var.isField) {
         /** load 'this' onto the stack*/
         jasminWriter.write("\taload 0\n");
       }
@@ -330,11 +317,10 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
 
       jasminWriter.write(JasminUtils.getStoreString(var, currentClass.id));
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
-
   }
 
   @Override
@@ -353,13 +339,12 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\tiastore \n");
     } catch (IOException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }finally {
+    } finally {
       return null;
     }
   }
 
-  /**------------------------------------------ Expressions ---------------------------------------------------*/
-
+  /** ------------------------------------------ Expressions --------------------------------------------------- */
 
   @Override
   public Object visitParenExp(@NotNull SnappyJavaParser.ParenExpContext ctx) {
@@ -383,7 +368,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       /** load value from array */
       jasminWriter.write("\tiaload\n");
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
@@ -405,7 +390,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       SnappyMethod m = symbolTable.classes.get(leftType.type).getMethod(ctx.ID().getText());
       jasminWriter.write(JasminUtils.getInvokevirtualString(m, leftType.type));
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
@@ -414,17 +399,15 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitLengthExp(@NotNull SnappyJavaParser.LengthExpContext ctx) {
 
-
     try {
       /** put the array reference on the stack */
       ctx.expr().accept(this);
       jasminWriter.write("\tarraylength\n");
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
-
   }
 
   @Override
@@ -433,14 +416,11 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\ticonst_1\n"); // write 1 on the stack
       ctx.expr().accept(this);            // write boolean 1 or 0 on stack
       jasminWriter.write("\tisub\n");     // subtract 0 or 1 from 1 and push on stack
-
-
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
-
   }
 
   @Override
@@ -449,7 +429,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       ctx.expr().accept(this);
       jasminWriter.write("\tnewarray int\n");
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     } finally {
       return null;
     }
@@ -460,7 +440,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     try {
       String className = ctx.ID().getText();
       jasminWriter.write("\tnew '" + className + "'\n"); // create a new object reference
-      jasminWriter.write("\tdup\n");                            // duplicate so we can invoke the constructor
+      jasminWriter.write(
+          "\tdup\n");                            // duplicate so we can invoke the constructor
       jasminWriter.write("\tinvokespecial " + className + "/<init>()V\n");
     } catch (IOException e) {
       System.err.println("Error");
@@ -480,6 +461,7 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     }
     return null;
   }
+
   @Override
   public Object visitAddSubOp(@NotNull SnappyJavaParser.AddSubOpContext ctx) {
     try {
@@ -528,9 +510,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\ticonst_1\n");
       jasminWriter.write("\tgoto " + done + "\n");
       //visitChildren(ctx);//TODO fix and comparison so that it does not do right hand side if left fails.
-      jasminWriter.write("\t" + falseLabel+ ":\n");
+      jasminWriter.write("\t" + falseLabel + ":\n");
       jasminWriter.write("\ticonst_0\n");
-      jasminWriter.write("\t" + done+ ":\n");
+      jasminWriter.write("\t" + done + ":\n");
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
@@ -569,11 +551,9 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
       jasminWriter.write("\t" + falseLabel + ":\n");
       jasminWriter.write("\ticonst_0\n");
       jasminWriter.write("\t" + doneLabel + ":\n");
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
   @Override public Object visitCEQComp(@NotNull SnappyJavaParser.CEQCompContext ctx) {
@@ -609,8 +589,8 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
   @Override
   public Object visitIdExp(@NotNull SnappyJavaParser.IdExpContext ctx) {
 
-      pushVariableToStack(ctx.ID().getText());
-      return null;
+    pushVariableToStack(ctx.ID().getText());
+    return null;
   }
 
   @Override
@@ -622,15 +602,14 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     } finally {
       return null;
     }
-
-
   }
- /** --------------------------------------------------------- boolliterals-----------------------------------------------*/
+
+  /** --------------------------------------------------------- boolliterals----------------------------------------------- */
 
   @Override
   public Object visitBoolLiterals(@NotNull SnappyJavaParser.BoolLiteralsContext ctx) {
     try {
-      if(ctx.TRUE() != null) {
+      if (ctx.TRUE() != null) {
         jasminWriter.write("\ticonst_1\n");
       } else {
         jasminWriter.write("\ticonst_0\n");
@@ -640,6 +619,5 @@ public class CodeGenVisitor extends SnappyJavaBaseVisitor {
     } finally {
       return null;
     }
-
   }
 }

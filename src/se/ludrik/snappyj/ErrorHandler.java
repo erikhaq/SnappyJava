@@ -104,8 +104,8 @@ public class ErrorHandler extends BaseErrorListener {
 
   public static void notAnumber(Token idToken) {
     if (JVMMain.printErrors) {
-      System.err.printf("Error:(%d, %d) java: %s could not be parsed to int",
-          idToken.getLine(), idToken.getCharPositionInLine(), idToken.getText());
+      System.err.printf("Error:(%d, %d) java: %s could not be parsed to int", idToken.getLine(),
+          idToken.getCharPositionInLine(), idToken.getText());
     }
     setErrorDetected();
   }
@@ -154,23 +154,26 @@ public class ErrorHandler extends BaseErrorListener {
     }
     setErrorDetected();
   }
+
   public static void cantCreateMultiDimensional(Token exprToken, String text, String location) {
     if (JVMMain.printErrors) {
       System.err.printf(
-              "Error:(%d, %d) java: cannot create multidimensional array\n\tsymbol:\t\t %s\n\tlocation:\t%s\n",
-              exprToken.getLine(), exprToken.getCharPositionInLine(), text, location);
+          "Error:(%d, %d) java: cannot create multidimensional array\n\tsymbol:\t\t %s\n\tlocation:\t%s\n",
+          exprToken.getLine(), exprToken.getCharPositionInLine(), text, location);
     }
     setErrorDetected();
   }
 
   public static void noMainMethod(Token tkn) {
-    System.err.printf("Error:(%d, %d) java: Main-method not named 'main'.", tkn.getLine(), tkn.getCharPositionInLine());
+    System.err.printf("Error:(%d, %d) java: Main-method not named 'main'.", tkn.getLine(),
+        tkn.getCharPositionInLine());
     setErrorDetected();
   }
 
   public static void cyclicInheritance(Token classIdToken, String classId) {
     // Error:(211, 1) java: cyclic inheritance involving se.ludrik.snappyj.TestCircle
-    System.err.printf("Error:(%d, %d) java: cyclic inheritance involving %s\n", classIdToken.getLine(), classIdToken.getCharPositionInLine(), classId);
+    System.err.printf("Error:(%d, %d) java: cyclic inheritance involving %s\n",
+        classIdToken.getLine(), classIdToken.getCharPositionInLine(), classId);
   }
 
   @Override
@@ -179,5 +182,4 @@ public class ErrorHandler extends BaseErrorListener {
     if (JVMMain.printErrors) System.err.printf("line %d:%d: %s\n", line, charPositionInLine, msg);
     setErrorDetected();
   }
-
 }
