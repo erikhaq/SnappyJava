@@ -1,14 +1,19 @@
 class Main {
     public static void main(String[] args) {
+        int[] bajs;
         Test t;
+        int x;
+        bajs = new int[3][4];
+        x = 87398273;
         t = new Test();
-        System.out.println(t.test(10));
+        System.out.println(x);
     }
 }
 class Test {
     public int test(int d) {
         return d * d;
     }
+
 }
 
 

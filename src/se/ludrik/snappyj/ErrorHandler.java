@@ -104,7 +104,7 @@ public class ErrorHandler extends BaseErrorListener {
 
   public static void notAnumber(Token idToken) {
     if (JVMMain.printErrors) {
-      System.err.printf("Error:(%d, %d) java: %s could not be parsed to int", idToken.getLine(),
+      System.err.printf("Error:(%d, %d) java: %s could not be parsed to int.\n", idToken.getLine(),
           idToken.getCharPositionInLine(), idToken.getText());
     }
     setErrorDetected();
